@@ -6,16 +6,12 @@ import {
   FaTrash,
   FaCalendarAlt,
   FaUsers,
-  FaCheckCircle,
-  FaTimesCircle,
   FaTrophy,
   FaCode,
   FaChartLine,
   FaBell,
-  FaStar,
   FaEye,
   FaMapMarkerAlt,
-  FaAward,
   FaFire,
   FaRocket,
 } from "react-icons/fa";
@@ -32,9 +28,8 @@ import {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
-  const { userHackathons, deleteHackathon, allHackathons, updateHackathon } =
-    useHackathons();
+  const { user } = useAuth();
+  const { userHackathons, deleteHackathon, allHackathons } = useHackathons();
 
   const [activeTab, setActiveTab] = useState("overview");
   const [isDeleting, setIsDeleting] = useState<string | null>(null);

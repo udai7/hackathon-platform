@@ -1,156 +1,343 @@
-# Hackathon Platform
+# 🚀 HackPub - Modern Hackathon Platform
 
-A comprehensive platform for creating, managing, and participating in hackathons.
+<div align="center">
 
-## Features
+![HackPub Logo](public/hackpub-logo.png)
 
-- Create and manage hackathons
-- Register for hackathons
-- Payment integration for registration fees
-- User dashboard for managing hackathons and registrations
+**A sleek, modern platform for creating, managing, and participating in hackathons worldwide**
 
-## Tech Stack
+[![React](https://img.shields.io/badge/React-18.2.0-blue.svg)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue.svg)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.0-38B2AC.svg)](https://tailwindcss.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-6.15.0-green.svg)](https://www.mongodb.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-- React with TypeScript
-- Tailwind CSS for styling
-- MongoDB for database
-- Express.js for backend API
-- Node.js
+</div>
 
-## Prerequisites
+## 🖼️ Screenshots
 
-- Node.js (v14 or higher)
-- MongoDB (local or MongoDB Atlas)
+<div align="center">
 
-## Getting Started
+### 🌟 Modern Dark UI with 3D Effects & Glassmorphism
+
+![HackPub Platform Screenshot](public/image.png)
+
+_Experience the sleek dark theme with neon accents, 3D card effects, and beautiful glassmorphism design_
+
+</div>
+
+## ✨ Features
+
+### 🎨 **Modern Dark UI with 3D Effects**
+
+- **Sleek Dark Theme**: Eye-catching dark interface with neon accents
+- **3D Card Effects**: Interactive cards with hover animations and depth
+- **Glassmorphism Design**: Beautiful glass-like components with backdrop blur
+- **Particle Background**: Dynamic animated particle system
+- **Responsive Design**: Optimized for all screen sizes
+
+### 🔐 **Robust Authentication System**
+
+- **Google OAuth Integration**: Sign in/up with Google accounts
+- **Session Management**: 24-hour sessions with auto-refresh
+- **JWT Token Security**: Secure token-based authentication
+- **Session Status Indicator**: Real-time session monitoring
+- **Multi-Provider Support**: Local and Google authentication
+
+### 🏆 **Comprehensive Hackathon Management**
+
+- **Create & Edit Hackathons**: Full-featured hackathon creation with rich forms
+- **Advanced Search & Filtering**: Find hackathons by category, location, and more
+- **Participant Management**: Handle registrations and team formations
+- **Payment Integration**: Razorpay integration for registration fees
+- **Project Submissions**: Submit and evaluate hackathon projects
+
+### 📊 **Smart Dashboard**
+
+- **Role-Based Views**: Different interfaces for hosts and participants
+- **Analytics & Stats**: Track participation, completion rates, and more
+- **Quick Actions**: Easy access to common tasks
+- **Recent Activity**: Stay updated with latest hackathon activities
+
+### 🎯 **Enhanced User Experience**
+
+- **Real-time Updates**: Live session status and notifications
+- **Smooth Animations**: Fluid transitions and micro-interactions
+- **Loading States**: Beautiful loading indicators and skeleton screens
+- **Error Handling**: Comprehensive error messages and recovery options
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+- **React 18.2** with TypeScript
+- **Tailwind CSS** for styling
+- **shadcn/ui** components
+- **React Router** for navigation
+- **Vite** for build tooling
+- **Google OAuth** for authentication
+
+### Backend
+
+- **Node.js** with Express
+- **MongoDB** with Mongoose
+- **JWT** for authentication
+- **Razorpay** for payments
+- **Google Gemini AI** for project evaluation
+
+### Development Tools
+
+- **TypeScript** for type safety
+- **ESLint** for code quality
+- **Concurrently** for running multiple processes
+- **tsx** for TypeScript execution
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- MongoDB (local or MongoDB Atlas)
+- **Node.js** (v18 or higher)
+- **MongoDB** (local installation or MongoDB Atlas)
+- **Google OAuth Credentials** (optional, for Google login)
 
 ### Installation
 
-1. Clone the repository
-   ```
-   git clone [repository-url]
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/udai7/hackathon-platform.git
    cd hackathon-platform
    ```
 
-2. Install dependencies
-   ```
+2. **Install dependencies**
+
+   ```bash
    npm install
    ```
 
-3. Set up environment variables
-   Create a `.env` file in the root directory with the following variables:
-   ```
+3. **Environment Setup**
+
+   Create a `.env` file in the root directory:
+
+   ```env
+   # Server Configuration
    PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/hackathon-platform
-   JWT_SECRET=your-secret-key
+
+   # Database
+   MONGODB_URI=mongodb+srv://username:password@cluster0.mongodb.net/hackathon-platform?retryWrites=true&w=majority
+
+   # Authentication
+   JWT_SECRET=hackpub-super-secret-jwt-key-2024
+   SESSION_SECRET=hackpub-session-secret-2024
+
+   # Google OAuth (Optional)
+   GOOGLE_CLIENT_ID=your-google-client-id
+   GOOGLE_CLIENT_SECRET=your-google-client-secret
+   VITE_GOOGLE_CLIENT_ID=your-google-client-id
+
+   # Payment Integration (Optional)
    RAZORPAY_KEY_ID=your-razorpay-key-id
    RAZORPAY_KEY_SECRET=your-razorpay-key-secret
    ```
 
-   If you're using MongoDB Atlas, your MONGODB_URI should look like:
-   ```
-   MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/hackathon-platform?retryWrites=true&w=majority
-   ```
+4. **Start the application**
 
-## Running the Application
+   **Option 1: Run both frontend and backend together**
 
-### Start the Backend Server
-
-First, start the backend server:
-
-```
-npm run backend
-```
-
-This script will:
-- Verify your environment setup
-- Create a default .env file if one doesn't exist
-- Start the server using ts-node
-
-### Start the Frontend Development Server
-
-In a separate terminal, start the frontend development server:
-
-```
-npm run dev
-```
-
-## Troubleshooting Common Issues
-
-### "Network Error, Please Try Again" 
-
-If you encounter network errors when creating, updating, or registering for hackathons:
-
-1. **Check Backend Server**: Make sure the backend server is running
-   ```
-   npm run backend
+   ```bash
+   npm run dev:full
    ```
 
-2. **Check MongoDB Connection**: Verify your MongoDB connection string in the `.env` file
+   **Option 2: Run separately**
 
-3. **MongoDB Running**: Ensure MongoDB is running if you're using a local installation
+   ```bash
+   # Terminal 1 - Backend
+   npm run server
 
-4. **Check Console for Errors**: Open browser developer tools (F12) and check the console for specific error messages
+   # Terminal 2 - Frontend
+   npm run dev
+   ```
 
-5. **Server Port**: Make sure the backend server is running on port 5000 (or the port specified in your .env file)
+5. **Access the application**
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:5000
 
-6. **CORS Issues**: If you see CORS errors in the console, check that the frontend is connecting to the correct backend URL
+## 🔧 Configuration
 
-7. **Timeout or Large Images**: If uploading images times out, try using a smaller image or using a URL instead
+### Google OAuth Setup
 
-### Backend Debugging
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing
+3. Enable Google+ API
+4. Create OAuth 2.0 credentials
+5. Add authorized origins: `http://localhost:5173`
+6. Update `.env` with your credentials
 
-For more detailed backend logs:
+### MongoDB Setup
+
+- **Local MongoDB**: Use `mongodb://localhost:27017/hackathon-platform`
+- **MongoDB Atlas**: Get connection string from your cluster
+
+### Payment Setup (Optional)
+
+1. Create a [Razorpay](https://razorpay.com/) account
+2. Get API keys from dashboard
+3. Update `.env` with your keys
+
+## 📁 Project Structure
 
 ```
+hackathon-platform/
+├── public/                 # Static assets
+├── src/
+│   ├── components/         # Reusable UI components
+│   │   ├── ui/            # shadcn/ui components
+│   │   ├── Navbar.tsx     # Navigation component
+│   │   ├── Footer.tsx     # Footer component
+│   │   └── ...
+│   ├── pages/             # Page components
+│   │   ├── Home.tsx       # Landing page
+│   │   ├── Login.tsx      # Authentication
+│   │   ├── Dashboard.tsx  # User dashboard
+│   │   └── ...
+│   ├── context/           # React contexts
+│   │   ├── AuthContext.tsx    # Authentication state
+│   │   └── HackathonContext.tsx # Hackathon data
+│   ├── services/          # API services
+│   ├── types/             # TypeScript types
+│   └── lib/               # Utility functions
+├── server.ts              # Backend server
+├── src/db/                # Database models and connection
+└── ...
+```
+
+## 🎨 UI Components
+
+### Custom Components
+
+- **3D Cards**: Interactive cards with depth and hover effects
+- **Glass Components**: Glassmorphism design elements
+- **Neon Effects**: Glowing text and borders
+- **Particle Background**: Animated particle system
+- **Session Status**: Real-time session monitoring
+
+### shadcn/ui Integration
+
+- **Button**: Multiple variants (cyber, glass, default)
+- **Input**: Modern input fields with focus states
+- **Card**: Flexible card components
+- **Loading**: Beautiful loading states
+
+## 🔐 Authentication Flow
+
+### Session Management
+
+- **24-hour sessions** with automatic refresh
+- **1-hour refresh threshold** for active users
+- **Secure token storage** with expiry validation
+- **Session status indicator** for user awareness
+
+### Google OAuth Flow
+
+1. User clicks "Sign in with Google"
+2. Google OAuth popup appears
+3. User authorizes the application
+4. JWT credential is received and validated
+5. User profile is created/updated
+6. Session is established with token
+
+## 🚀 Deployment
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+### Environment Variables for Production
+
+Ensure all environment variables are set in your production environment, especially:
+
+- `MONGODB_URI` (production database)
+- `JWT_SECRET` (strong secret key)
+- `GOOGLE_CLIENT_ID` (production OAuth credentials)
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**1. Network Errors**
+
+- Ensure backend server is running on port 5000
+- Check MongoDB connection string
+- Verify CORS configuration
+
+**2. Google OAuth Issues**
+
+- Verify Google Client ID in environment variables
+- Check authorized origins in Google Console
+- Ensure HTTPS in production
+
+**3. Session Problems**
+
+- Clear browser localStorage if sessions are stuck
+- Check JWT token expiry
+- Verify session secret configuration
+
+**4. Build Errors**
+
+- Run `npm install` to ensure all dependencies
+- Check TypeScript configuration
+- Verify environment variables
+
+### Debug Mode
+
+```bash
+# Backend with detailed logs
 npm run backend:debug
+
+# Check build issues
+npm run build
 ```
 
-This will show all debug information, which can help identify the source of network problems.
+## 🤝 Contributing
 
-## Development
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-To run both frontend and backend concurrently with a single command:
+## 📄 License
 
-```
-npm run dev:full
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## API Endpoints
+## 🙏 Acknowledgments
 
-The backend API provides the following endpoints:
+- **shadcn/ui** for beautiful UI components
+- **Tailwind CSS** for utility-first styling
+- **React OAuth Google** for authentication
+- **Lucide React** for icons
+- **Framer Motion** for animations
 
-- `GET /api/hackathons` - Get all hackathons
-- `GET /api/hackathons/featured` - Get featured hackathons
-- `GET /api/hackathons/:id` - Get hackathon by ID
-- `GET /api/hackathons/creator/:creatorId` - Get hackathons by creator
-- `POST /api/hackathons` - Create a new hackathon
-- `PUT /api/hackathons/:id` - Update a hackathon
-- `DELETE /api/hackathons/:id` - Delete a hackathon
-- `POST /api/hackathons/:id/participants` - Register for a hackathon
+## 📞 Contact & Support
 
-## MongoDB Schema
+<div align="center">
 
-The application uses two main collections:
+**Udai Das**
 
-1. **Hackathons** - Stores hackathon information
-2. **Users** - Stores user information
+[![Email](https://img.shields.io/badge/Email-udaid347%40gmail.com-red.svg)](mailto:udaid347@gmail.com)
+[![GitHub](https://img.shields.io/badge/GitHub-udai7-black.svg)](https://github.com/udai7)
+[![Portfolio](https://img.shields.io/badge/Portfolio-Visit-blue.svg)](https://udaidas.tech/)
 
+</div>
 
-## 📞 Contact
+---
 
-- **Email**: [udaid347@gmail.com](mailto:udaid347@gmail.com)
-- **GitHub**: [@udai7](https://github.com/udai7)
-- **Website**: [portfolio-website-udai.vercel.app]([https://udaidas.com](https://portfolio-website-udai.vercel.app/))
+<div align="center">
 
+**⭐ Star this repository if you found it helpful!**
 
-The MongoDB connection is handled in the `src/db/connection.ts` file. The connection string can be configured in the `.env` file.
+Made with ❤️ by [Udai Das](https://github.com/udai7)
 
-### Seeding Initial Data
-
-The application will automatically seed initial hackathon data if the database is empty when the server starts.
+</div>

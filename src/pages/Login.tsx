@@ -1,12 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  FaLock,
-  FaEnvelope,
-  FaEye,
-  FaEyeSlash,
-  FaGoogle,
-} from "react-icons/fa";
+import { FaLock, FaEnvelope, FaEye, FaEyeSlash } from "react-icons/fa";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "../components/ui/button";

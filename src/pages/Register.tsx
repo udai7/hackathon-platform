@@ -8,7 +8,6 @@ import {
   FaEyeSlash,
   FaUserTie,
   FaUsers,
-  FaGoogle,
 } from "react-icons/fa";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
@@ -34,7 +33,9 @@ const Register = () => {
   // Get role from URL query params
   const queryParams = new URLSearchParams(location.search);
   const roleFromUrl = queryParams.get("role") || "participant";
-  const [role, setRole] = useState(roleFromUrl);
+  const [role, setRole] = useState<"host" | "participant">(
+    roleFromUrl as "host" | "participant"
+  );
 
   useEffect(() => {
     // Redirect if user is already logged in
@@ -215,7 +216,9 @@ const Register = () => {
                   name="role"
                   className="input-modern appearance-none cursor-pointer"
                   value={role}
-                  onChange={(e) => setRole(e.target.value)}
+                  onChange={(e) =>
+                    setRole(e.target.value as "host" | "participant")
+                  }
                 >
                   <option
                     value="participant"

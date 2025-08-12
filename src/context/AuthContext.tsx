@@ -1,4 +1,4 @@
-import React, {
+import {
   createContext,
   useContext,
   useState,
@@ -273,7 +273,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         role: foundUser.role,
         createdAt: foundUser.createdAt,
         avatar: foundUser.avatar,
-        provider: foundUser.provider,
+        provider: (foundUser.provider as "local" | "google") || "local",
       };
 
       // Generate session
@@ -332,7 +332,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         email: newUser.email,
         role: newUser.role,
         createdAt: newUser.createdAt,
-        provider: newUser.provider,
+        provider: newUser.provider as "local" | "google",
       };
 
       // Generate session
