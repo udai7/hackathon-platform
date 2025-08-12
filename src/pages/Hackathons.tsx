@@ -113,9 +113,10 @@ const Hackathons = () => {
               <Button
                 onClick={resetFilters}
                 variant="glass"
-                className="md:w-auto"
+                size="default"
+                className="md:w-auto flex items-center"
               >
-                <FaTimes className="mr-2" /> Clear Filters
+                <FaTimes className="mr-2 w-4 h-4" /> Clear Filters
               </Button>
             </div>
           </CardContent>

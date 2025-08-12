@@ -8,7 +8,9 @@ import {
   FaEyeSlash,
   FaUserTie,
   FaUsers,
+  FaGoogle,
 } from "react-icons/fa";
+import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -25,7 +27,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { register, user } = useAuth();
+  const { register, loginWithGoogle, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -61,6 +63,21 @@ const Register = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      setError("");
+      await loginWithGoogle(credentialResponse.credential);
+      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "Google registration failed");
+      console.error(err);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setError("Google registration failed. Please try again.");
   };
 
   return (
@@ -221,6 +238,30 @@ const Register = () => {
                 Create Account
               </Button>
             </form>
+
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-600" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-gray-900 text-gray-400">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  theme="filled_black"
+                  size="large"
+                  width="100%"
+                  text="signup_with"
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

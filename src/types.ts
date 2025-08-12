@@ -24,7 +24,10 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'host' | 'participant' | 'admin';
+  role: "host" | "participant" | "admin";
+  avatar?: string;
+  provider?: "local" | "google";
+  createdAt?: string;
 }
 
 export interface Payment {
@@ -33,7 +36,7 @@ export interface Payment {
   hackathonId: string;
   amount: number;
   currency: string;
-  status: 'pending' | 'completed' | 'failed';
+  status: "pending" | "completed" | "failed";
   orderId: string;
   paymentId?: string;
   receiptId: string;
@@ -53,8 +56,8 @@ export interface Participant {
   teamName?: string;
   teammates?: string[];
   submissionDate: string;
-  status: 'pending' | 'approved' | 'rejected';
-  paymentStatus?: 'pending' | 'completed' | 'failed' | 'not_required';
+  status: "pending" | "approved" | "rejected";
+  paymentStatus?: "pending" | "completed" | "failed" | "not_required";
   paymentId?: string;
   hackathonPaymentRequired?: boolean;
   upiId?: string;
@@ -87,4 +90,4 @@ export interface Participant {
       rankedAt: Date;
     };
   };
-} 
+}
