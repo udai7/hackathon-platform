@@ -1,60 +1,85 @@
-import { Link } from 'react-router-dom';
-import { FaCode, FaLaptop, FaTrophy, FaUserPlus, FaUsers, FaUserTie } from 'react-icons/fa';
-import { useAuth } from '../context/AuthContext';
+import { Link } from "react-router-dom";
+import {
+  FaCode,
+  FaLaptop,
+  FaTrophy,
+  FaUserPlus,
+  FaUsers,
+  FaUserTie,
+  FaRocket,
+  FaStar,
+} from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 
 const Home = () => {
   const { user } = useAuth();
 
   return (
-    <div className="bg-gray-50">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="relative z-10 pb-8 bg-gray-50 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
-            <svg
-              className="hidden lg:block absolute right-0 inset-y-0 h-full w-48 text-gray-50 transform translate-x-1/2"
-              fill="currentColor"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              <polygon points="50,0 100,0 50,100 0,100" />
-            </svg>
-            <div className="pt-10 sm:pt-16 lg:pt-8 xl:pt-16">
-              <div className="sm:text-center lg:text-left px-4 sm:px-8 xl:pr-16">
-                <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                  <span className="block">Discover & Participate in</span>
-                  <span className="block text-indigo-600">Global Hackathons</span>
+      <div className="relative overflow-hidden cyber-grid">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative z-10 pt-20 pb-16 sm:pb-24 lg:pb-32">
+            <div className="text-center">
+              <div className="floating">
+                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-8">
+                  <span className="block text-white mb-2">
+                    Discover & Participate in
+                  </span>
+                  <span className="block gradient-text">Global Hackathons</span>
                 </h1>
-                <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto lg:mx-0">
-                  Join HackPub, the premier platform for coding competitions and innovation challenges.
-                  Connect with developers, showcase your skills, and build the next big thing.
+              </div>
+
+              <div className="floating max-w-3xl mx-auto">
+                <p className="mt-6 text-xl text-gray-300 leading-relaxed">
+                  Join{" "}
+                  <span className="gradient-text font-semibold">HackPub</span>,
+                  the premier platform for coding competitions and innovation
+                  challenges. Connect with developers, showcase your skills, and
+                  build the next big thing.
                 </p>
-                <div className="mt-8 sm:flex sm:justify-center lg:justify-start">
-                  <div className="rounded-md shadow">
-                    <Link
-                      to="/hackathons"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10"
-                    >
-                      Explore Hackathons
-                    </Link>
-                  </div>
-                  <div className="mt-3 sm:mt-0 sm:ml-3">
-                    <Link
-                      to={user ? "/dashboard" : "/register"}
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10"
-                    >
-                      {user ? "My Dashboard" : "Get Started"}
-                    </Link>
-                  </div>
-                </div>
+              </div>
+
+              <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Button
+                  asChild
+                  variant="cyber"
+                  size="lg"
+                  className="text-lg px-8 py-4"
+                >
+                  <Link to="/hackathons">
+                    <FaRocket className="mr-2" />
+                    Explore Hackathons
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="glass"
+                  size="lg"
+                  className="text-lg px-8 py-4"
+                >
+                  <Link to={user ? "/dashboard" : "/register"}>
+                    <FaStar className="mr-2" />
+                    {user ? "My Dashboard" : "Get Started"}
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>
         </div>
-        <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
+
+        {/* Hero Image/Visual */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-pink-900/20" />
           <img
-            className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full"
+            className="w-full h-full object-cover opacity-10"
             src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
             alt="Coding hackathon"
           />
@@ -63,105 +88,133 @@ const Home = () => {
 
       {/* User Role Selection Section (only shown for non-logged in users) */}
       {!user && (
-        <div className="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-base font-semibold text-indigo-600 tracking-wide uppercase">Get Started</h2>
-            <p className="mt-1 text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight">
-              Choose Your Path
-            </p>
-            <p className="max-w-xl mt-5 mx-auto text-xl text-gray-500">
+        <div className="max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-sm font-semibold neon-blue tracking-wide uppercase mb-4">
+              Get Started
+            </h2>
+            <h3 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">
+              Choose Your <span className="gradient-text">Path</span>
+            </h3>
+            <p className="max-w-2xl mx-auto text-xl text-gray-400 leading-relaxed">
               Register based on your role and start your hackathon journey today
             </p>
           </div>
 
-          <div className="mt-12 grid gap-8 lg:grid-cols-2">
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="px-4 py-5 sm:p-6 text-center">
-                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100">
-                  <FaUserTie className="h-8 w-8 text-indigo-600" />
+          <div className="grid gap-8 lg:grid-cols-2 max-w-4xl mx-auto">
+            <Card className="card-3d glass-dark group">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <FaUserTie className="h-10 w-10 text-white" />
                 </div>
-                <h3 className="mt-5 text-lg leading-6 font-medium text-gray-900">Host a Hackathon</h3>
-                <p className="mt-2 text-sm text-gray-500 h-24">
-                  Create and manage hackathons, review submissions, and connect with talented participants.
-                  Perfect for companies, universities, and organizations looking to foster innovation.
+                <CardTitle className="text-2xl text-white group-hover:text-blue-400 transition-colors">
+                  Host a Hackathon
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-400 mb-8 leading-relaxed">
+                  Create and manage hackathons, review submissions, and connect
+                  with talented participants. Perfect for companies,
+                  universities, and organizations looking to foster innovation.
                 </p>
-                <div className="mt-5">
-                  <Link
-                    to="/register?role=host"
-                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-                  >
+                <Button asChild variant="cyber" className="w-full">
+                  <Link to="/register?role=host">
                     <FaUserPlus className="mr-2" /> Register as Host
                   </Link>
-                </div>
-              </div>
-            </div>
+                </Button>
+              </CardContent>
+            </Card>
 
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="px-4 py-5 sm:p-6 text-center">
-                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-indigo-100">
-                  <FaUsers className="h-8 w-8 text-indigo-600" />
+            <Card className="card-3d glass-dark group">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <FaUsers className="h-10 w-10 text-white" />
                 </div>
-                <h3 className="mt-5 text-lg leading-6 font-medium text-gray-900">Join as Participant</h3>
-                <p className="mt-2 text-sm text-gray-500 h-24">
-                  Discover exciting hackathons, form teams, showcase your skills, and compete for prizes.
-                  Great for students, professionals, and anyone looking to challenge themselves.
+                <CardTitle className="text-2xl text-white group-hover:text-purple-400 transition-colors">
+                  Join as Participant
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-400 mb-8 leading-relaxed">
+                  Discover exciting hackathons, form teams, showcase your
+                  skills, and compete for prizes. Great for students,
+                  professionals, and anyone looking to challenge themselves.
                 </p>
-                <div className="mt-5">
-                  <Link
-                    to="/register?role=participant"
-                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-                  >
+                <Button asChild variant="cyber" className="w-full">
+                  <Link to="/register?role=participant">
                     <FaUserPlus className="mr-2" /> Register as Participant
                   </Link>
-                </div>
-              </div>
-            </div>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       )}
 
       {/* Features Section */}
-      <div className="bg-white py-12">
+      <div className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center">
-            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Features</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Everything you need for successful hackathons
-            </p>
+          <div className="text-center mb-16">
+            <h2 className="text-sm font-semibold neon-purple tracking-wide uppercase mb-4">
+              Features
+            </h2>
+            <h3 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">
+              Everything you need for{" "}
+              <span className="gradient-text">successful hackathons</span>
+            </h3>
           </div>
 
-          <div className="mt-10">
-            <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
-              <div className="flex flex-col items-center">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
-                  <FaLaptop className="h-6 w-6" />
+          <div className="grid gap-8 md:grid-cols-3">
+            <Card className="card-3d glass-dark group text-center">
+              <CardHeader>
+                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <FaLaptop className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="mt-6 text-lg font-medium text-gray-900 text-center">Easy Hosting</h3>
-                <p className="mt-2 text-base text-gray-500 text-center">
-                  Seamlessly create and manage hackathons with our intuitive platform designed for organizers.
+                <CardTitle className="text-white group-hover:text-blue-400 transition-colors">
+                  Easy Hosting
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-400 leading-relaxed">
+                  Seamlessly create and manage hackathons with our intuitive
+                  platform designed for organizers.
                 </p>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div className="flex flex-col items-center">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
-                  <FaUsers className="h-6 w-6" />
+            <Card className="card-3d glass-dark group text-center">
+              <CardHeader>
+                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <FaUsers className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="mt-6 text-lg font-medium text-gray-900 text-center">Team Building</h3>
-                <p className="mt-2 text-base text-gray-500 text-center">
-                  Connect with like-minded individuals and form powerful teams to tackle challenging problems.
+                <CardTitle className="text-white group-hover:text-purple-400 transition-colors">
+                  Team Building
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-400 leading-relaxed">
+                  Connect with like-minded individuals and form powerful teams
+                  to tackle challenging problems.
                 </p>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div className="flex flex-col items-center">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
-                  <FaTrophy className="h-6 w-6" />
+            <Card className="card-3d glass-dark group text-center">
+              <CardHeader>
+                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <FaTrophy className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="mt-6 text-lg font-medium text-gray-900 text-center">Compete & Win</h3>
-                <p className="mt-2 text-base text-gray-500 text-center">
-                  Participate in hackathons with exciting prizes and gain recognition for your innovative solutions.
+                <CardTitle className="text-white group-hover:text-yellow-400 transition-colors">
+                  Compete & Win
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-400 leading-relaxed">
+                  Participate in hackathons with exciting prizes and gain
+                  recognition for your innovative solutions.
                 </p>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
@@ -169,4 +222,4 @@ const Home = () => {
   );
 };
 
-export default Home; 
+export default Home;

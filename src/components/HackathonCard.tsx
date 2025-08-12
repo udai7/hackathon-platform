@@ -1,13 +1,21 @@
-import { FC } from 'react';
-import { FaCalendarAlt, FaMapMarkerAlt, FaUsers } from 'react-icons/fa';
-import { Hackathon } from '../types';
+import { FC } from "react";
+import { FaCalendarAlt, FaMapMarkerAlt, FaUsers } from "react-icons/fa";
+import { Hackathon } from "../types";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { Button } from "./ui/button";
 
 // Format date to display in a readable format
 const formatDate = (dateString: string) => {
-  const options: Intl.DateTimeFormatOptions = { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   };
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
@@ -26,62 +34,80 @@ const HackathonCard: FC<HackathonCardProps> = ({ hackathon }) => {
     image,
     category,
     teamSize,
-    participants = []
+    participants = [],
   } = hackathon;
 
   return (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden h-full hover:shadow-lg transition-shadow duration-300">
+    <Card className="card-3d glass-dark overflow-hidden h-full group">
       {/* Card Image */}
       <div className="h-48 overflow-hidden relative">
-        <img 
-          src={image || '/default-hackathon.jpg'} 
-          alt={title} 
-          className="w-full h-full object-cover"
+        <img
+          src={image || "/default-hackathon.jpg"}
+          alt={title}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
-        <div className="absolute top-0 right-0 bg-indigo-600 text-white px-3 py-1 m-2 rounded-full text-xs font-semibold">
-          {category}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        <div className="absolute top-0 right-0 m-3">
+          <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+            {category}
+          </span>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <div className="flex items-center space-x-2 text-white/80 text-xs">
+            <FaUsers className="text-blue-400" />
+            <span>{participants.length} Participants</span>
+          </div>
         </div>
       </div>
-      
+
       {/* Card Content */}
-      <div className="p-5">
-        <h3 className="font-bold text-xl mb-2 text-gray-800 line-clamp-2">{title}</h3>
-        <p className="text-gray-600 text-sm mb-4 line-clamp-3">{description}</p>
-        
+      <CardHeader className="pb-3">
+        <CardTitle className="text-white group-hover:text-blue-400 transition-colors duration-300 line-clamp-2">
+          {title}
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="space-y-3">
+        <p className="text-gray-400 text-sm line-clamp-3 leading-relaxed">
+          {description}
+        </p>
+
         {/* Card Meta Info */}
-        <div className="space-y-2 text-sm text-gray-700">
-          <div className="flex items-center">
-            <FaCalendarAlt className="text-indigo-500 mr-2" />
-            <span>
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center text-gray-300">
+            <FaCalendarAlt className="text-blue-400 mr-2 flex-shrink-0" />
+            <span className="truncate">
               {formatDate(startDate)} - {formatDate(endDate)}
             </span>
           </div>
-          
+
           {location && (
-            <div className="flex items-center">
-              <FaMapMarkerAlt className="text-indigo-500 mr-2" />
-              <span>{location}</span>
+            <div className="flex items-center text-gray-300">
+              <FaMapMarkerAlt className="text-purple-400 mr-2 flex-shrink-0" />
+              <span className="truncate">{location}</span>
             </div>
           )}
-          
-          <div className="flex items-center">
-            <FaUsers className="text-indigo-500 mr-2" />
-            <span>
-              {participants.length} Participants
-              {teamSize && Number(teamSize) > 1 && ` • Teams of ${teamSize}`}
-            </span>
-          </div>
+
+          {teamSize && Number(teamSize) > 1 && (
+            <div className="flex items-center text-gray-300">
+              <FaUsers className="text-green-400 mr-2 flex-shrink-0" />
+              <span>Teams of {teamSize}</span>
+            </div>
+          )}
         </div>
-        
-        {/* Action Button */}
-        <div className="mt-4 pt-4 border-t border-gray-100">
-          <button className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-sm font-medium transition-colors duration-300">
-            View Details
-          </button>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+
+      {/* Action Button */}
+      <CardFooter className="pt-0">
+        <Button
+          variant="cyber"
+          className="w-full group-hover:shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300"
+        >
+          View Details
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
 
-export default HackathonCard; 
+export default HackathonCard;
