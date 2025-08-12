@@ -4,12 +4,20 @@ import {
   FaUser,
   FaEnvelope,
   FaLock,
-  FaCheck,
-  FaExclamationCircle,
   FaEye,
   FaEyeSlash,
+  FaUserTie,
+  FaUsers,
 } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -56,143 +64,165 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 cyber-grid">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <img
-          className="mx-auto h-12 w-auto"
-          src="/hackpub-logo.png"
-          alt="HackPub"
-        />
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Register as a {role === "host" ? "Hackathon Host" : "Participant"}
+        <div className="flex justify-center mb-8">
+          <img
+            className="h-12 w-auto transition-transform duration-300 hover:scale-110"
+            src="/hackpub-logo.png"
+            alt="HackPub"
+            style={{ filter: "brightness(0) invert(1)" }}
+          />
+        </div>
+        <h2 className="text-center text-4xl font-extrabold gradient-text mb-2">
+          Join the Community
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Or{" "}
+        <p className="text-center text-gray-400 mb-4">
+          Register as a {role === "host" ? "Hackathon Host" : "Participant"}
+        </p>
+        <p className="text-center text-gray-400">
+          Already have an account?{" "}
           <Link
             to="/login"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
+            className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
           >
-            sign in to your account
+            Sign in here
           </Link>
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {error && (
-            <div
-              className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-              role="alert"
-            >
-              <span className="block sm:inline">{error}</span>
-            </div>
-          )}
+        <Card className="card-3d glass-dark">
+          <CardHeader>
+            <CardTitle className="text-center text-white flex items-center justify-center">
+              {role === "host" ? (
+                <FaUserTie className="mr-2 text-blue-400" />
+              ) : (
+                <FaUsers className="mr-2 text-purple-400" />
+              )}
+              Create Your Account
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {error && (
+              <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400">
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Full Name
-              </label>
-              <div className="mt-1">
-                <input
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-300 mb-2"
+                >
+                  <FaUser className="inline mr-2" />
+                  Full Name
+                </label>
+                <Input
                   id="name"
                   name="name"
                   type="text"
                   required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white"
+                  className="input-modern"
+                  placeholder="Enter your full name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
-            </div>
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email address
-              </label>
-              <div className="mt-1">
-                <input
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-300 mb-2"
+                >
+                  <FaEnvelope className="inline mr-2" />
+                  Email address
+                </label>
+                <Input
                   id="email"
                   name="email"
                   type="email"
                   autoComplete="email"
                   required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white"
+                  className="input-modern"
+                  placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-            </div>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <div className="mt-1 relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="new-password"
-                  required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={togglePasswordVisibility}
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-300 mb-2"
                 >
-                  {showPassword ? (
-                    <FaEyeSlash className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <FaEye className="h-5 w-5 text-gray-400" />
-                  )}
-                </button>
+                  <FaLock className="inline mr-2" />
+                  Password
+                </label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    required
+                    className="input-modern pr-12"
+                    placeholder="Create a strong password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-blue-400 transition-colors"
+                    onClick={togglePasswordVisibility}
+                  >
+                    {showPassword ? (
+                      <FaEyeSlash className="h-5 w-5" />
+                    ) : (
+                      <FaEye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div>
-              <label
-                htmlFor="role"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Register as
-              </label>
-              <div className="mt-1">
+              <div>
+                <label
+                  htmlFor="role"
+                  className="block text-sm font-medium text-gray-300 mb-2"
+                >
+                  Register as
+                </label>
                 <select
                   id="role"
                   name="role"
-                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-white"
+                  className="input-modern appearance-none cursor-pointer"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                 >
-                  <option value="participant">Participant</option>
-                  <option value="host">Hackathon Host</option>
+                  <option
+                    value="participant"
+                    className="bg-gray-800 text-white"
+                  >
+                    🎯 Participant - Join hackathons and compete
+                  </option>
+                  <option value="host" className="bg-gray-800 text-white">
+                    🏆 Host - Organize and manage hackathons
+                  </option>
                 </select>
               </div>
-            </div>
 
-            <div>
-              <button
+              <Button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                variant="cyber"
+                className="w-full"
+                size="lg"
               >
-                Register
-              </button>
-            </div>
-          </form>
-        </div>
+                Create Account
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

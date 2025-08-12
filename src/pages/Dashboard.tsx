@@ -1,123 +1,116 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaPlus, FaEdit, FaTrash, FaCalendarAlt, FaUsers, FaCheckCircle, FaTimesCircle, FaSignOutAlt } from 'react-icons/fa';
-import { useAuth } from '../context/AuthContext';
-import { useHackathons } from '../context/HackathonContext';
-import { Participant, Hackathon } from '../types';
-import * as hackathonService from '../services/hackathonService';
-
-// Remove unused sample data
-// const myHackathonsData = [...];
-// const mySubmissionsData = [...];
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  FaPlus,
+  FaEdit,
+  FaTrash,
+  FaCalendarAlt,
+  FaUsers,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaSignOutAlt,
+  FaTrophy,
+  FaCode,
+  FaChartLine,
+  FaBell,
+  FaStar,
+  FaGithub,
+  FaExternalLinkAlt,
+  FaClock,
+  FaMapMarkerAlt,
+  FaAward,
+  FaFire,
+  FaRocket,
+  FaEye,
+  FaDownload,
+  FaShare,
+  FaUser,
+  FaSearch,
+} from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
+import { useHackathons } from "../context/HackathonContext";
+import { Participant, Hackathon } from "../types";
+import * as hackathonService from "../services/hackathonService";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { userHackathons, deleteHackathon, allHackathons, addHackathon, updateHackathon } = useHackathons();
-  
-  const [activeTab, setActiveTab] = useState('my-hackathons');
+  const {
+    userHackathons,
+    deleteHackathon,
+    allHackathons,
+    addHackathon,
+    updateHackathon,
+  } = useHackathons();
+
+  const [activeTab, setActiveTab] = useState("overview");
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const [selectedHackathon, setSelectedHackathon] = useState<string | null>(null);
-  const [activeParticipantTab, setActiveParticipantTab] = useState('pending');
-  const [myParticipations, setMyParticipations] = useState<{hackathon: Hackathon, participant: Participant}[]>([]);
+  const [selectedHackathon, setSelectedHackathon] = useState<string | null>(
+    null
+  );
+  const [activeParticipantTab, setActiveParticipantTab] = useState("pending");
+  const [myParticipations, setMyParticipations] = useState<
+    { hackathon: Hackathon; participant: Participant }[]
+  >([]);
   const [isWithdrawing, setIsWithdrawing] = useState<string | null>(null);
-  const [activeSubmissionTab, setActiveSubmissionTab] = useState('pending');
-  
+
   // Redirect if not logged in
   useEffect(() => {
     if (!user) {
-      navigate('/login');
+      navigate("/login");
     }
   }, [user, navigate]);
-  
-  // Add sample data if no hackathons exist
-  useEffect(() => {
-    if (user && allHackathons.length === 0) {
-      try {
-        // If no hackathons at all, add some sample data
-        const sampleHackathons = [
-          {
-            id: '1',
-            title: 'AI Innovation Challenge',
-            description: 'Develop AI solutions for real-world problems',
-            startDate: '2023-12-01',
-            endDate: '2023-12-15',
-            registrationDeadline: '2023-11-25',
-            organizerName: 'Tech Innovators',
-            category: 'Artificial Intelligence',
-            location: 'Online',
-            image: 'https://images.unsplash.com/photo-1591453089816-0fbb971b454c?q=80&w=1470&auto=format&fit=crop',
-            prizes: '₹50,000 in prizes',
-            teamSize: '1-4',
-            registrationFee: 'Free',
-            website: 'https://example.com/ai-challenge',
-            creatorId: user.id,
-            featured: true,
-            participants: []
-          },
-          {
-            id: '2',
-            title: 'HealthTech Hackathon',
-            description: 'Create innovative solutions for healthcare challenges',
-            startDate: '2023-12-10',
-            endDate: '2023-12-12',
-            registrationDeadline: '2023-12-05',
-            organizerName: 'Health Innovate',
-            category: 'Healthcare',
-            location: 'New Delhi, India',
-            image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1470&auto=format&fit=crop',
-            prizes: '₹25,000 in prizes',
-            teamSize: '2-5',
-            registrationFee: '₹200',
-            website: 'https://example.com/healthtech',
-            creatorId: '2',
-            featured: true,
-            participants: []
-          }
-        ];
-        
-        // Add sample hackathons
-        sampleHackathons.forEach((hackathon) => {
-          addHackathon(hackathon);
-        });
-      } catch (error) {
-        console.error('Error adding sample hackathons:', error);
-      }
-    }
-  }, [user, allHackathons, addHackathon]);
-  
+
   // Get all hackathons where the user is a participant
   useEffect(() => {
-    if (user && user.role === 'participant' && allHackathons.length > 0) {
+    if (user && user.role === "participant" && allHackathons.length > 0) {
       const participations = allHackathons
-        .filter(hackathon => 
-          hackathon.participants?.some(participant => participant.userId === user.id)
+        .filter((hackathon) =>
+          hackathon.participants?.some(
+            (participant) => participant.userId === user.id
+          )
         )
-        .map(hackathon => {
-          const participant = hackathon.participants?.find(p => p.userId === user.id);
+        .map((hackathon) => {
+          const participant = hackathon.participants?.find(
+            (p) => p.userId === user.id
+          );
           if (participant) {
             return { hackathon, participant };
           }
           return null;
         })
-        .filter(item => item !== null) as {hackathon: Hackathon, participant: Participant}[];
-      
+        .filter((item) => item !== null) as {
+        hackathon: Hackathon;
+        participant: Participant;
+      }[];
+
       setMyParticipations(participations);
     }
   }, [user, allHackathons]);
-  
+
   const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-  
+
   const handleDeleteHackathon = async (hackathonId: string) => {
-    if (window.confirm('Are you sure you want to delete this hackathon?')) {
+    if (window.confirm("Are you sure you want to delete this hackathon?")) {
       setIsDeleting(hackathonId);
       try {
         await deleteHackathon(hackathonId);
       } catch (error) {
-        console.error('Error deleting hackathon:', error);
+        console.error("Error deleting hackathon:", error);
       } finally {
         setIsDeleting(null);
       }
@@ -128,625 +121,949 @@ const Dashboard = () => {
     navigate(`/create-hackathon/${hackathonId}`);
   };
 
-  const handleParticipantAction = (hackathonId: string, participantId: string, status: 'approved' | 'rejected') => {
-    const hackathon = userHackathons.find(h => h.id === hackathonId);
+  const handleParticipantAction = (
+    hackathonId: string,
+    participantId: string,
+    status: "approved" | "rejected"
+  ) => {
+    const hackathon = userHackathons.find((h) => h.id === hackathonId);
     if (!hackathon) return;
 
-    const updatedParticipants = hackathon.participants?.map(participant => 
-      participant.id === participantId ? { ...participant, status } : participant
+    const updatedParticipants = hackathon.participants?.map((participant) =>
+      participant.id === participantId
+        ? { ...participant, status }
+        : participant
     );
 
     const updatedHackathon = {
       ...hackathon,
-      participants: updatedParticipants
+      participants: updatedParticipants,
     };
 
     updateHackathon(updatedHackathon);
   };
 
   const getFilteredParticipants = (hackathonId: string, status: string) => {
-    const hackathon = userHackathons.find(h => h.id === hackathonId);
-    if (!hackathon || !hackathon.participants || hackathon.participants.length === 0) {
+    const hackathon = userHackathons.find((h) => h.id === hackathonId);
+    if (
+      !hackathon ||
+      !hackathon.participants ||
+      hackathon.participants.length === 0
+    ) {
       return [];
     }
 
-    if (status === 'all') {
+    if (status === "all") {
       return hackathon.participants;
     }
 
-    return hackathon.participants.filter(p => p.status === status);
+    return hackathon.participants.filter((p) => p.status === status);
   };
 
-  const handleDeleteAnyHackathon = async (hackathonId: string) => {
-    if (window.confirm('Are you sure you want to delete this hackathon? This is an admin action.')) {
-      setIsDeleting(hackathonId);
-      try {
-        await deleteHackathon(hackathonId);
-      } catch (error) {
-        console.error('Error deleting hackathon:', error);
-      } finally {
-        setIsDeleting(null);
-      }
-    }
-  };
-  
-  // New function to handle withdrawal from a hackathon
   const handleWithdraw = async (hackathonId: string, participantId: string) => {
-    if (window.confirm('Are you sure you want to withdraw from this hackathon?')) {
+    if (
+      window.confirm("Are you sure you want to withdraw from this hackathon?")
+    ) {
       setIsWithdrawing(hackathonId);
       try {
         await hackathonService.withdrawParticipant(hackathonId, participantId);
-        
-        // Update local state to reflect the withdrawal
-        setMyParticipations(prev => 
-          prev.filter(p => !(p.hackathon.id === hackathonId && p.participant.id === participantId))
+
+        setMyParticipations((prev) =>
+          prev.filter(
+            (p) =>
+              !(
+                p.hackathon.id === hackathonId &&
+                p.participant.id === participantId
+              )
+          )
         );
-        
       } catch (error) {
-        console.error('Error withdrawing from hackathon:', error);
-        alert('Failed to withdraw from the hackathon. Please try again.');
+        console.error("Error withdrawing from hackathon:", error);
+        alert("Failed to withdraw from the hackathon. Please try again.");
       } finally {
         setIsWithdrawing(null);
       }
     }
   };
-  
+
   const handleSubmitProject = (hackathonId: string, participantId: string) => {
     navigate(`/hackathon/${hackathonId}/submit-project/${participantId}`);
   };
 
   const getSubmissionStatus = (participant: Participant) => {
     if (!participant.projectSubmission) {
-      return 'Not Submitted';
+      return "Not Submitted";
     }
     if (participant.projectSubmission.evaluation) {
       return `Evaluated (Score: ${participant.projectSubmission.evaluation.score})`;
     }
-    return 'Submitted';
+    return "Submitted";
   };
-  
+
   if (!user) {
-    return <div className="flex justify-center items-center h-96">Loading...</div>;
-  }
-  
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-gray-600">Welcome, {user.name || 'User'}!</p>
-          <p className="text-gray-600">Role: <span className="capitalize">{user.role}</span></p>
-        </div>
-        <div className="mt-4 md:mt-0 flex space-x-4">
-          {user.role === 'host' && (
-            <Link
-              to="/create-hackathon"
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
-            >
-              <FaPlus /> Create Hackathon
-            </Link>
-          )}
-          <button
-            onClick={() => logout()}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded transition"
-          >
-            Logout
-          </button>
-        </div>
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="loading-spinner"></div>
       </div>
-      
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="border-b border-gray-200">
-          <nav className="flex">
-            <button
-              className={`px-6 py-4 text-sm font-medium ${
-                activeTab === 'my-hackathons'
-                  ? 'border-b-2 border-blue-500 text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-              onClick={() => setActiveTab('my-hackathons')}
-            >
-              {user.role === 'host' ? 'My Hackathons' : 'Registered Hackathons'}
-            </button>
-            {user.role === 'admin' && (
-              <button
-                className={`px-6 py-4 text-sm font-medium ${
-                  activeTab === 'all-hackathons'
-                    ? 'border-b-2 border-blue-500 text-blue-600'
-                    : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-                onClick={() => setActiveTab('all-hackathons')}
-              >
-                All Hackathons
-              </button>
+    );
+  }
+
+  // Calculate stats for participant dashboard
+  const participantStats = {
+    total: myParticipations.length,
+    approved: myParticipations.filter(
+      (p) => p.participant.status === "approved"
+    ).length,
+    pending: myParticipations.filter((p) => p.participant.status === "pending")
+      .length,
+    submitted: myParticipations.filter((p) => p.participant.projectSubmission)
+      .length,
+  };
+
+  // Calculate stats for host dashboard
+  const hostStats = {
+    total: userHackathons.length,
+    totalParticipants: userHackathons.reduce(
+      (acc, h) => acc + (h.participants?.length || 0),
+      0
+    ),
+    activeHackathons: userHackathons.filter(
+      (h) => new Date(h.endDate) > new Date()
+    ).length,
+    completedHackathons: userHackathons.filter(
+      (h) => new Date(h.endDate) <= new Date()
+    ).length,
+  };
+
+  return (
+    <div className="min-h-screen py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
+          <div className="mb-4 lg:mb-0">
+            <h1 className="text-4xl font-bold gradient-text mb-2">
+              Welcome back, {user.name || "User"}! 👋
+            </h1>
+            <p className="text-gray-400 text-lg">
+              {user.role === "host"
+                ? "Manage your hackathons and participants"
+                : "Track your hackathon journey"}
+            </p>
+            <div className="flex items-center mt-2">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 border border-blue-500/30">
+                <FaUser className="mr-2" />
+                {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+              </span>
+            </div>
+          </div>
+          <div className="flex space-x-3">
+            {user.role === "host" && (
+              <Button asChild variant="cyber" size="lg">
+                <Link to="/create-hackathon">
+                  <FaPlus className="mr-2" /> Create Hackathon
+                </Link>
+              </Button>
             )}
-            <button
-              className={`px-6 py-4 text-sm font-medium ${
-                activeTab === 'account'
-                  ? 'border-b-2 border-blue-500 text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-              onClick={() => setActiveTab('account')}
-            >
-              Account Settings
-            </button>
-          </nav>
+            <Button variant="glass" size="lg">
+              <FaBell className="mr-2" /> Notifications
+            </Button>
+          </div>
         </div>
-        
-        <div className="p-6">
-          {activeTab === 'my-hackathons' && (
-            <div>
-              {user.role === 'host' ? (
-                userHackathons && userHackathons.length > 0 ? (
-                  <div className="space-y-6">
-                    {userHackathons.map(hackathon => (
-                      <div key={hackathon.id} className="border rounded-lg overflow-hidden shadow-sm">
-                        <div className="flex flex-col md:flex-row">
-                          <div className="md:w-1/4 h-48 md:h-auto">
-                            <img
-                              src={hackathon.image || 'https://via.placeholder.com/300x200?text=Hackathon'}
-                              alt={hackathon.title}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex-1 p-4">
-                            <div className="flex flex-col md:flex-row justify-between">
-                              <div>
-                                <h3 className="text-xl font-bold mb-2">{hackathon.title}</h3>
-                                <p className="text-gray-600 mb-4">
-                                  {hackathon.description && hackathon.description.substring(0, 150)}...
-                                </p>
-                                <div className="flex items-center text-gray-500 mb-2">
-                                  <FaCalendarAlt className="mr-2" />
-                                  {formatDate(hackathon.startDate)} - {formatDate(hackathon.endDate)}
-                                </div>
-                                <div className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                  {hackathon.category}
-                                </div>
-                                {hackathon.participants && hackathon.participants.length > 0 && (
-                                  <div className="mt-2 flex items-center text-gray-500">
-                                    <FaUsers className="mr-2" /> 
-                                    {hackathon.participants.length} Participants
-                                  </div>
-                                )}
-                              </div>
-                              <div className="flex mt-4 md:mt-0 space-x-2">
-                                <button
-                                  onClick={() => handleEditHackathon(hackathon.id)}
-                                  className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded"
-                                >
-                                  <FaEdit /> Edit
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteHackathon(hackathon.id)}
-                                  disabled={isDeleting === hackathon.id}
-                                  className={`flex items-center gap-1 px-3 py-2 rounded ${
-                                    isDeleting === hackathon.id
-                                      ? 'bg-red-200 text-red-700 opacity-75'
-                                      : 'bg-red-100 hover:bg-red-200 text-red-700'
-                                  }`}
-                                >
-                                  <FaTrash /> {isDeleting === hackathon.id ? 'Deleting...' : 'Delete'}
-                                </button>
-                              </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {user.role === "participant" ? (
+            <>
+              <Card className="card-3d glass-dark">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm font-medium">
+                        Total Registrations
+                      </p>
+                      <p className="text-3xl font-bold text-white">
+                        {participantStats.total}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-blue-500/20 rounded-full">
+                      <FaRocket className="h-6 w-6 text-blue-400" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="card-3d glass-dark">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm font-medium">
+                        Approved
+                      </p>
+                      <p className="text-3xl font-bold text-green-400">
+                        {participantStats.approved}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-green-500/20 rounded-full">
+                      <FaCheckCircle className="h-6 w-6 text-green-400" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="card-3d glass-dark">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm font-medium">
+                        Pending
+                      </p>
+                      <p className="text-3xl font-bold text-yellow-400">
+                        {participantStats.pending}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-yellow-500/20 rounded-full">
+                      <FaClock className="h-6 w-6 text-yellow-400" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="card-3d glass-dark">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm font-medium">
+                        Projects Submitted
+                      </p>
+                      <p className="text-3xl font-bold text-purple-400">
+                        {participantStats.submitted}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-purple-500/20 rounded-full">
+                      <FaCode className="h-6 w-6 text-purple-400" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          ) : (
+            <>
+              <Card className="card-3d glass-dark">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm font-medium">
+                        Total Hackathons
+                      </p>
+                      <p className="text-3xl font-bold text-white">
+                        {hostStats.total}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-blue-500/20 rounded-full">
+                      <FaTrophy className="h-6 w-6 text-blue-400" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="card-3d glass-dark">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm font-medium">
+                        Total Participants
+                      </p>
+                      <p className="text-3xl font-bold text-green-400">
+                        {hostStats.totalParticipants}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-green-500/20 rounded-full">
+                      <FaUsers className="h-6 w-6 text-green-400" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="card-3d glass-dark">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm font-medium">
+                        Active Events
+                      </p>
+                      <p className="text-3xl font-bold text-yellow-400">
+                        {hostStats.activeHackathons}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-yellow-500/20 rounded-full">
+                      <FaFire className="h-6 w-6 text-yellow-400" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="card-3d glass-dark">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm font-medium">
+                        Completed
+                      </p>
+                      <p className="text-3xl font-bold text-purple-400">
+                        {hostStats.completedHackathons}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-purple-500/20 rounded-full">
+                      <FaAward className="h-6 w-6 text-purple-400" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </div>
+
+        {/* Navigation Tabs */}
+        <Card className="glass-dark mb-8">
+          <CardContent className="p-0">
+            <div className="flex overflow-x-auto">
+              <button
+                className={`px-6 py-4 text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                  activeTab === "overview"
+                    ? "text-blue-400 border-b-2 border-blue-400 bg-blue-500/10"
+                    : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+                }`}
+                onClick={() => setActiveTab("overview")}
+              >
+                <FaChartLine className="inline mr-2" />
+                Overview
+              </button>
+              <button
+                className={`px-6 py-4 text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                  activeTab === "hackathons"
+                    ? "text-blue-400 border-b-2 border-blue-400 bg-blue-500/10"
+                    : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+                }`}
+                onClick={() => setActiveTab("hackathons")}
+              >
+                <FaTrophy className="inline mr-2" />
+                {user.role === "host" ? "My Hackathons" : "My Registrations"}
+              </button>
+              <button
+                className={`px-6 py-4 text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                  activeTab === "achievements"
+                    ? "text-blue-400 border-b-2 border-blue-400 bg-blue-500/10"
+                    : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+                }`}
+                onClick={() => setActiveTab("achievements")}
+              >
+                <FaAward className="inline mr-2" />
+                Achievements
+              </button>
+              <button
+                className={`px-6 py-4 text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                  activeTab === "profile"
+                    ? "text-blue-400 border-b-2 border-blue-400 bg-blue-500/10"
+                    : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+                }`}
+                onClick={() => setActiveTab("profile")}
+              >
+                <FaUser className="inline mr-2" />
+                Profile
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tab Content */}
+        {activeTab === "overview" && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Recent Activity */}
+            <Card className="glass-dark">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <FaClock className="mr-2 text-blue-400" />
+                  Recent Activity
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {user.role === "participant"
+                    ? myParticipations
+                        .slice(0, 5)
+                        .map(({ hackathon, participant }) => (
+                          <div
+                            key={`${hackathon.id}-${participant.id}`}
+                            className="flex items-center space-x-3 p-3 rounded-lg bg-gray-800/30"
+                          >
+                            <div
+                              className={`w-3 h-3 rounded-full ${
+                                participant.status === "approved"
+                                  ? "bg-green-400"
+                                  : participant.status === "rejected"
+                                  ? "bg-red-400"
+                                  : "bg-yellow-400"
+                              }`}
+                            ></div>
+                            <div className="flex-1">
+                              <p className="text-white font-medium">
+                                {hackathon.title}
+                              </p>
+                              <p className="text-gray-400 text-sm">
+                                Status: {participant.status}
+                              </p>
                             </div>
+                            <span className="text-gray-400 text-sm">
+                              {formatDate(hackathon.startDate)}
+                            </span>
                           </div>
+                        ))
+                    : userHackathons.slice(0, 5).map((hackathon) => (
+                        <div
+                          key={hackathon.id}
+                          className="flex items-center space-x-3 p-3 rounded-lg bg-gray-800/30"
+                        >
+                          <div className="w-3 h-3 rounded-full bg-blue-400"></div>
+                          <div className="flex-1">
+                            <p className="text-white font-medium">
+                              {hackathon.title}
+                            </p>
+                            <p className="text-gray-400 text-sm">
+                              {hackathon.participants?.length || 0} participants
+                            </p>
+                          </div>
+                          <span className="text-gray-400 text-sm">
+                            {formatDate(hackathon.startDate)}
+                          </span>
                         </div>
-                        
-                        {/* Participants section for host */}
-                        {user.role === 'host' && hackathon.participants && hackathon.participants.length > 0 && (
-                          <div className="border-t border-gray-200 p-4">
-                            <div className="flex justify-between items-center mb-4">
-                              <h4 className="text-lg font-medium">Participants</h4>
-                              <button
-                                onClick={() => setSelectedHackathon(selectedHackathon === hackathon.id ? null : hackathon.id)}
-                                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                              >
-                                {selectedHackathon === hackathon.id ? 'Hide Participants' : 'Show Participants'}
-                              </button>
-                            </div>
-                            
-                            {selectedHackathon === hackathon.id && (
-                              <div>
-                                <div className="mb-4 border-b border-gray-200">
-                                  <nav className="flex">
-                                    <button
-                                      className={`px-4 py-2 text-sm font-medium ${
-                                        activeParticipantTab === 'all'
-                                          ? 'border-b-2 border-blue-500 text-blue-600'
-                                          : 'text-gray-500 hover:text-gray-700'
-                                      }`}
-                                      onClick={() => setActiveParticipantTab('all')}
-                                    >
-                                      All ({hackathon.participants.length})
-                                    </button>
-                                    <button
-                                      className={`px-4 py-2 text-sm font-medium ${
-                                        activeParticipantTab === 'pending'
-                                          ? 'border-b-2 border-blue-500 text-blue-600'
-                                          : 'text-gray-500 hover:text-gray-700'
-                                      }`}
-                                      onClick={() => setActiveParticipantTab('pending')}
-                                    >
-                                      Pending ({hackathon.participants.filter(p => p.status === 'pending').length})
-                                    </button>
-                                    <button
-                                      className={`px-4 py-2 text-sm font-medium ${
-                                        activeParticipantTab === 'approved'
-                                          ? 'border-b-2 border-blue-500 text-blue-600'
-                                          : 'text-gray-500 hover:text-gray-700'
-                                      }`}
-                                      onClick={() => setActiveParticipantTab('approved')}
-                                    >
-                                      Approved ({hackathon.participants.filter(p => p.status === 'approved').length})
-                                    </button>
-                                    <button
-                                      className={`px-4 py-2 text-sm font-medium ${
-                                        activeParticipantTab === 'rejected'
-                                          ? 'border-b-2 border-blue-500 text-blue-600'
-                                          : 'text-gray-500 hover:text-gray-700'
-                                      }`}
-                                      onClick={() => setActiveParticipantTab('rejected')}
-                                    >
-                                      Rejected ({hackathon.participants.filter(p => p.status === 'rejected').length})
-                                    </button>
-                                  </nav>
-                                </div>
-                                
-                                {getFilteredParticipants(hackathon.id, activeParticipantTab).length > 0 ? (
-                                  <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-200">
-                                      <thead className="bg-gray-50">
-                                        <tr>
-                                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Skills</th>
-                                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
-                                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody className="bg-white divide-y divide-gray-200">
-                                        {getFilteredParticipants(hackathon.id, activeParticipantTab).map((participant: Participant) => (
-                                          <tr key={participant.id}>
-                                            <td className="px-4 py-3 whitespace-nowrap">{participant.name}</td>
-                                            <td className="px-4 py-3 whitespace-nowrap">{participant.email}</td>
-                                            <td className="px-4 py-3">
-                                              <div className="flex flex-wrap gap-1">
-                                                {participant.skills?.map((skill, idx) => (
-                                                  <span key={idx} className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                                    {skill}
-                                                  </span>
-                                                ))}
-                                              </div>
-                                            </td>
-                                            <td className="px-4 py-3">
-                                              {participant.teamName ? (
-                                                <div>
-                                                  <div className="font-medium">{participant.teamName}</div>
-                                                  {participant.teammates && participant.teammates.length > 0 && (
-                                                    <div className="text-xs text-gray-500">
-                                                      {participant.teammates.join(', ')}
-                                                    </div>
-                                                  )}
-                                                </div>
-                                              ) : (
-                                                <span className="text-gray-500">Individual</span>
-                                              )}
-                                            </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                              <span className={`inline-flex px-2 py-1 text-xs rounded-full ${
-                                                participant.status === 'approved'
-                                                  ? 'bg-green-100 text-green-800'
-                                                  : participant.status === 'rejected'
-                                                  ? 'bg-red-100 text-red-800'
-                                                  : 'bg-yellow-100 text-yellow-800'
-                                              }`}>
-                                                {participant.status.charAt(0).toUpperCase() + participant.status.slice(1)}
-                                              </span>
-                                            </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                              {participant.status === 'pending' && (
-                                                <div className="flex space-x-2">
-                                                  <button
-                                                    onClick={() => handleParticipantAction(hackathon.id, participant.id, 'approved')}
-                                                    className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none"
-                                                    title="Approve"
-                                                  >
-                                                    <FaCheckCircle className="w-4 h-4" />
-                                                  </button>
-                                                  <button
-                                                    onClick={() => handleParticipantAction(hackathon.id, participant.id, 'rejected')}
-                                                    className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none"
-                                                    title="Reject"
-                                                  >
-                                                    <FaTimesCircle className="w-4 h-4" />
-                                                  </button>
-                                                </div>
-                                              )}
-                                            </td>
-                                          </tr>
-                                        ))}
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                ) : (
-                                  <div className="text-center py-4 text-gray-500">
-                                    No participants found in this category.
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500 mb-4">You haven't created any hackathons yet.</p>
-                    <Link
-                      to="/create-hackathon"
-                      className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
+                      ))}
+                  {((user.role === "participant" &&
+                    myParticipations.length === 0) ||
+                    (user.role === "host" && userHackathons.length === 0)) && (
+                    <div className="text-center py-8 text-gray-400">
+                      <FaRocket className="mx-auto h-12 w-12 mb-4 opacity-50" />
+                      <p>No recent activity</p>
+                      <p className="text-sm">
+                        {user.role === "participant"
+                          ? "Start by registering for a hackathon!"
+                          : "Create your first hackathon to get started!"}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card className="glass-dark">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <FaRocket className="mr-2 text-purple-400" />
+                  Quick Actions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 gap-4">
+                  {user.role === "participant" ? (
+                    <>
+                      <Button
+                        asChild
+                        variant="cyber"
+                        className="w-full justify-start"
+                      >
+                        <Link to="/hackathons">
+                          <FaSearch className="mr-2" />
+                          Browse Hackathons
+                        </Link>
+                      </Button>
+                      <Button variant="glass" className="w-full justify-start">
+                        <FaUser className="mr-2" />
+                        Update Profile
+                      </Button>
+                      <Button variant="glass" className="w-full justify-start">
+                        <FaGithub className="mr-2" />
+                        Connect GitHub
+                      </Button>
+                      <Button variant="glass" className="w-full justify-start">
+                        <FaDownload className="mr-2" />
+                        Download Certificate
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        asChild
+                        variant="cyber"
+                        className="w-full justify-start"
+                      >
+                        <Link to="/create-hackathon">
+                          <FaPlus className="mr-2" />
+                          Create New Hackathon
+                        </Link>
+                      </Button>
+                      <Button variant="glass" className="w-full justify-start">
+                        <FaChartLine className="mr-2" />
+                        View Analytics
+                      </Button>
+                      <Button variant="glass" className="w-full justify-start">
+                        <FaShare className="mr-2" />
+                        Share Hackathon
+                      </Button>
+                      <Button variant="glass" className="w-full justify-start">
+                        <FaDownload className="mr-2" />
+                        Export Data
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {activeTab === "hackathons" && (
+          <div>
+            {user.role === "participant" ? (
+              myParticipations.length > 0 ? (
+                <div className="grid gap-6">
+                  {myParticipations.map(({ hackathon, participant }) => (
+                    <Card
+                      key={`${hackathon.id}-${participant.id}`}
+                      className="card-3d glass-dark"
                     >
-                      <FaPlus /> Create Your First Hackathon
-                    </Link>
-                  </div>
-                )
-              ) : (
-                myParticipations.length > 0 ? (
-                  <div className="space-y-6">
-                    {myParticipations.map(({ hackathon, participant }) => (
-                      <div key={`${hackathon.id}-${participant.id}`} className="border rounded-lg overflow-hidden shadow-sm">
-                        <div className="flex flex-col md:flex-row">
-                          <div className="md:w-1/4 h-48 md:h-auto">
+                      <CardContent className="p-6">
+                        <div className="flex flex-col lg:flex-row gap-6">
+                          <div className="lg:w-1/4">
                             <img
-                              src={hackathon.image || 'https://via.placeholder.com/300x200?text=Hackathon'}
+                              src={
+                                hackathon.image ||
+                                "https://via.placeholder.com/300x200?text=Hackathon"
+                              }
                               alt={hackathon.title}
-                              className="w-full h-full object-cover"
+                              className="w-full h-48 object-cover rounded-lg"
                             />
                           </div>
-                          <div className="flex-1 p-4">
-                            <div className="flex flex-col md:flex-row justify-between">
+                          <div className="flex-1">
+                            <div className="flex flex-col lg:flex-row justify-between items-start mb-4">
                               <div>
-                                <h3 className="text-xl font-bold mb-2">{hackathon.title}</h3>
-                                <p className="text-gray-600 mb-4">
-                                  {hackathon.description && hackathon.description.substring(0, 150)}...
+                                <h3 className="text-2xl font-bold text-white mb-2">
+                                  {hackathon.title}
+                                </h3>
+                                <p className="text-gray-400 mb-4 line-clamp-2">
+                                  {hackathon.description}
                                 </p>
-                                <div className="flex items-center text-gray-500 mb-2">
-                                  <FaCalendarAlt className="mr-2" />
-                                  {formatDate(hackathon.startDate)} - {formatDate(hackathon.endDate)}
+                                <div className="flex flex-wrap gap-4 text-sm text-gray-400 mb-4">
+                                  <div className="flex items-center">
+                                    <FaCalendarAlt className="mr-2 text-blue-400" />
+                                    {formatDate(hackathon.startDate)} -{" "}
+                                    {formatDate(hackathon.endDate)}
+                                  </div>
+                                  <div className="flex items-center">
+                                    <FaMapMarkerAlt className="mr-2 text-purple-400" />
+                                    {hackathon.location}
+                                  </div>
                                 </div>
-                                <div className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                  {hackathon.category}
-                                </div>
-                                
-                                {/* Participation status */}
-                                <div className="mt-2">
-                                  <span className="text-sm font-medium text-gray-700">Status: </span>
-                                  <span className={`text-sm ml-1 ${
-                                    participant.status === 'approved' 
-                                      ? 'text-green-600' 
-                                      : participant.status === 'rejected'
-                                        ? 'text-red-600'
-                                        : 'text-yellow-600'
-                                  }`}>
-                                    {participant.status.charAt(0).toUpperCase() + participant.status.slice(1)}
+                                <div className="flex items-center gap-4">
+                                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-500/20 text-blue-400">
+                                    {hackathon.category}
+                                  </span>
+                                  <span
+                                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                                      participant.status === "approved"
+                                        ? "bg-green-500/20 text-green-400"
+                                        : participant.status === "rejected"
+                                        ? "bg-red-500/20 text-red-400"
+                                        : "bg-yellow-500/20 text-yellow-400"
+                                    }`}
+                                  >
+                                    {participant.status
+                                      .charAt(0)
+                                      .toUpperCase() +
+                                      participant.status.slice(1)}
                                   </span>
                                 </div>
-                                
-                                {/* Payment status if applicable */}
-                                {participant.paymentStatus && participant.paymentStatus !== 'not_required' && (
-                                  <div className="mt-1">
-                                    <span className="text-sm font-medium text-gray-700">Payment: </span>
-                                    <span className={`text-sm ml-1 ${
-                                      participant.paymentStatus === 'completed' 
-                                        ? 'text-green-600' 
-                                        : participant.paymentStatus === 'failed'
-                                          ? 'text-red-600'
-                                          : 'text-yellow-600'
-                                    }`}>
-                                      {participant.paymentStatus.charAt(0).toUpperCase() + participant.paymentStatus.slice(1)}
-                                    </span>
-                                  </div>
+                              </div>
+                              <div className="flex flex-col gap-2 mt-4 lg:mt-0">
+                                <Button asChild variant="cyber" size="sm">
+                                  <Link to={`/hackathon/${hackathon.id}`}>
+                                    <FaEye className="mr-2" />
+                                    View Details
+                                  </Link>
+                                </Button>
+                                {participant.status === "approved" && (
+                                  <Button
+                                    onClick={() =>
+                                      handleSubmitProject(
+                                        hackathon.id,
+                                        participant.id
+                                      )
+                                    }
+                                    variant="glass"
+                                    size="sm"
+                                  >
+                                    <FaCode className="mr-2" />
+                                    Submit Project
+                                  </Button>
                                 )}
-                              </div>
-                              
-                              {/* Actions */}
-                              <div className="mt-4 md:mt-0 flex flex-col items-end">
-                                <Link
-                                  to={`/hackathons/${hackathon.id}`}
-                                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 mb-2"
-                                >
-                                  View Details
-                                </Link>
-                                
-                                <button
-                                  onClick={() => handleWithdraw(hackathon.id, participant.id)}
+                                <Button
+                                  onClick={() =>
+                                    handleWithdraw(hackathon.id, participant.id)
+                                  }
+                                  variant="outline"
+                                  size="sm"
                                   disabled={isWithdrawing === hackathon.id}
-                                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 flex items-center"
+                                  className="text-red-400 border-red-400 hover:bg-red-500/10"
                                 >
-                                  {isWithdrawing === hackathon.id ? (
-                                    <span>Withdrawing...</span>
-                                  ) : (
-                                    <>
-                                      <FaSignOutAlt className="mr-2" />
-                                      Withdraw
-                                    </>
-                                  )}
-                                </button>
+                                  <FaSignOutAlt className="mr-2" />
+                                  {isWithdrawing === hackathon.id
+                                    ? "Withdrawing..."
+                                    : "Withdraw"}
+                                </Button>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500 mb-4">You haven't registered for any hackathons yet.</p>
-                    <Link
-                      to="/hackathons"
-                      className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
-                    >
-                      Browse Hackathons
-                    </Link>
-                  </div>
-                )
-              )}
-            </div>
-          )}
-          
-          {activeTab === 'all-hackathons' && user.role === 'admin' && (
-            <div>
-              <h2 className="text-xl font-bold mb-4">All Hackathons (Admin View)</h2>
-              {allHackathons && allHackathons.length > 0 ? (
-                <div className="space-y-6">
-                  {allHackathons.map(hackathon => (
-                    <div key={hackathon.id} className="border rounded-lg overflow-hidden shadow-sm">
-                      <div className="flex flex-col md:flex-row">
-                        <div className="md:w-1/4 h-48 md:h-auto">
-                          <img
-                            src={hackathon.image || 'https://via.placeholder.com/300x200?text=Hackathon'}
-                            alt={hackathon.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1 p-4">
-                          <div className="flex flex-col md:flex-row justify-between">
-                            <div>
-                              <h3 className="text-xl font-bold mb-2">{hackathon.title}</h3>
-                              <p className="text-gray-600 mb-4">
-                                {hackathon.description && hackathon.description.substring(0, 150)}...
-                              </p>
-                              <div className="flex items-center text-gray-500 mb-2">
-                                <FaCalendarAlt className="mr-2" />
-                                {formatDate(hackathon.startDate)} - {formatDate(hackathon.endDate)}
-                              </div>
-                              <div className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                                {hackathon.category}
-                              </div>
-                              <div className="mt-2 text-gray-500">
-                                Creator ID: {hackathon.creatorId}
-                              </div>
-                              {hackathon.participants && hackathon.participants.length > 0 && (
-                                <div className="mt-2 flex items-center text-gray-500">
-                                  <FaUsers className="mr-2" /> 
-                                  {hackathon.participants.length} Participants
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex mt-4 md:mt-0 space-x-2">
-                              <Link
-                                to={`/hackathon/${hackathon.id}`}
-                                className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded"
-                              >
-                                View
-                              </Link>
-                              <button
-                                onClick={() => handleDeleteAnyHackathon(hackathon.id)}
-                                disabled={isDeleting === hackathon.id}
-                                className={`flex items-center gap-1 px-3 py-2 rounded ${
-                                  isDeleting === hackathon.id
-                                    ? 'bg-red-200 text-red-700 opacity-75'
-                                    : 'bg-red-100 hover:bg-red-200 text-red-700'
-                                }`}
-                              >
-                                <FaTrash /> {isDeleting === hackathon.id ? 'Deleting...' : 'Delete'}
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Participants section for admin view */}
-                      {hackathon.participants && hackathon.participants.length > 0 && (
-                        <div className="border-t border-gray-200 p-4">
-                          <div className="flex justify-between items-center mb-4">
-                            <h4 className="text-lg font-medium">Participants</h4>
-                            <button
-                              onClick={() => setSelectedHackathon(selectedHackathon === hackathon.id ? null : hackathon.id)}
-                              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                            >
-                              {selectedHackathon === hackathon.id ? 'Hide Participants' : 'Show Participants'}
-                            </button>
-                          </div>
-                          
-                          {selectedHackathon === hackathon.id && (
-                            <div className="overflow-x-auto">
-                              <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
-                                  <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                  </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                  {hackathon.participants.map((participant: Participant) => (
-                                    <tr key={participant.id}>
-                                      <td className="px-4 py-3 whitespace-nowrap">{participant.name}</td>
-                                      <td className="px-4 py-3 whitespace-nowrap">{participant.email}</td>
-                                      <td className="px-4 py-3 whitespace-nowrap">
-                                        <span className={`inline-flex px-2 py-1 text-xs rounded-full ${
-                                          participant.status === 'approved'
-                                            ? 'bg-green-100 text-green-800'
-                                            : participant.status === 'rejected'
-                                            ? 'bg-red-100 text-red-800'
-                                            : 'bg-yellow-100 text-yellow-800'
-                                        }`}>
-                                          {participant.status.charAt(0).toUpperCase() + participant.status.slice(1)}
-                                        </span>
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                  <p className="text-gray-500">No hackathons found in the system.</p>
-                </div>
-              )}
-            </div>
-          )}
-          
-          {activeTab === 'account' && (
-            <div>
-              <h2 className="text-xl font-bold mb-4">Account Information</h2>
-              <div className="space-y-4">
+                <Card className="glass-dark text-center py-16">
+                  <CardContent>
+                    <FaRocket className="mx-auto h-16 w-16 text-gray-400 mb-6" />
+                    <h3 className="text-2xl font-bold text-white mb-4">
+                      No Hackathons Yet
+                    </h3>
+                    <p className="text-gray-400 mb-8 max-w-md mx-auto">
+                      You haven't registered for any hackathons yet. Start your
+                      journey by exploring available hackathons!
+                    </p>
+                    <Button asChild variant="cyber" size="lg">
+                      <Link to="/hackathons">
+                        <FaSearch className="mr-2" />
+                        Browse Hackathons
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              )
+            ) : // Host hackathons view
+            userHackathons.length > 0 ? (
+              <div className="grid gap-6">
+                {userHackathons.map((hackathon) => (
+                  <Card key={hackathon.id} className="card-3d glass-dark">
+                    <CardContent className="p-6">
+                      <div className="flex flex-col lg:flex-row gap-6">
+                        <div className="lg:w-1/4">
+                          <img
+                            src={
+                              hackathon.image ||
+                              "https://via.placeholder.com/300x200?text=Hackathon"
+                            }
+                            alt={hackathon.title}
+                            className="w-full h-48 object-cover rounded-lg"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex flex-col lg:flex-row justify-between items-start mb-4">
+                            <div>
+                              <h3 className="text-2xl font-bold text-white mb-2">
+                                {hackathon.title}
+                              </h3>
+                              <p className="text-gray-400 mb-4 line-clamp-2">
+                                {hackathon.description}
+                              </p>
+                              <div className="flex flex-wrap gap-4 text-sm text-gray-400 mb-4">
+                                <div className="flex items-center">
+                                  <FaCalendarAlt className="mr-2 text-blue-400" />
+                                  {formatDate(hackathon.startDate)} -{" "}
+                                  {formatDate(hackathon.endDate)}
+                                </div>
+                                <div className="flex items-center">
+                                  <FaUsers className="mr-2 text-green-400" />
+                                  {hackathon.participants?.length || 0}{" "}
+                                  Participants
+                                </div>
+                              </div>
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-500/20 text-blue-400">
+                                {hackathon.category}
+                              </span>
+                            </div>
+                            <div className="flex flex-col gap-2 mt-4 lg:mt-0">
+                              <Button
+                                onClick={() =>
+                                  handleEditHackathon(hackathon.id)
+                                }
+                                variant="cyber"
+                                size="sm"
+                              >
+                                <FaEdit className="mr-2" />
+                                Edit
+                              </Button>
+                              <Button
+                                onClick={() =>
+                                  setSelectedHackathon(
+                                    selectedHackathon === hackathon.id
+                                      ? null
+                                      : hackathon.id
+                                  )
+                                }
+                                variant="glass"
+                                size="sm"
+                              >
+                                <FaUsers className="mr-2" />
+                                Manage Participants
+                              </Button>
+                              <Button
+                                onClick={() =>
+                                  handleDeleteHackathon(hackathon.id)
+                                }
+                                variant="outline"
+                                size="sm"
+                                disabled={isDeleting === hackathon.id}
+                                className="text-red-400 border-red-400 hover:bg-red-500/10"
+                              >
+                                <FaTrash className="mr-2" />
+                                {isDeleting === hackathon.id
+                                  ? "Deleting..."
+                                  : "Delete"}
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Participants Management */}
+                          {selectedHackathon === hackathon.id &&
+                            hackathon.participants &&
+                            hackathon.participants.length > 0 && (
+                              <div className="mt-6 p-4 bg-gray-800/30 rounded-lg">
+                                <div className="flex justify-between items-center mb-4">
+                                  <h4 className="text-lg font-medium text-white">
+                                    Participants Management
+                                  </h4>
+                                </div>
+
+                                <div className="mb-4 flex gap-2 overflow-x-auto">
+                                  {[
+                                    "all",
+                                    "pending",
+                                    "approved",
+                                    "rejected",
+                                  ].map((status) => (
+                                    <button
+                                      key={status}
+                                      className={`px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition-all ${
+                                        activeParticipantTab === status
+                                          ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                                          : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                                      }`}
+                                      onClick={() =>
+                                        setActiveParticipantTab(status)
+                                      }
+                                    >
+                                      {status.charAt(0).toUpperCase() +
+                                        status.slice(1)}
+                                      (
+                                      {status === "all"
+                                        ? hackathon.participants.length
+                                        : hackathon.participants.filter(
+                                            (p) => p.status === status
+                                          ).length}
+                                      )
+                                    </button>
+                                  ))}
+                                </div>
+
+                                <div className="space-y-3 max-h-96 overflow-y-auto">
+                                  {getFilteredParticipants(
+                                    hackathon.id,
+                                    activeParticipantTab
+                                  ).map((participant: Participant) => (
+                                    <div
+                                      key={participant.id}
+                                      className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg"
+                                    >
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-3">
+                                          <div>
+                                            <p className="text-white font-medium">
+                                              {participant.name}
+                                            </p>
+                                            <p className="text-gray-400 text-sm">
+                                              {participant.email}
+                                            </p>
+                                          </div>
+                                          <span
+                                            className={`px-2 py-1 text-xs rounded-full ${
+                                              participant.status === "approved"
+                                                ? "bg-green-500/20 text-green-400"
+                                                : participant.status ===
+                                                  "rejected"
+                                                ? "bg-red-500/20 text-red-400"
+                                                : "bg-yellow-500/20 text-yellow-400"
+                                            }`}
+                                          >
+                                            {participant.status}
+                                          </span>
+                                        </div>
+                                        {participant.skills &&
+                                          participant.skills.length > 0 && (
+                                            <div className="flex flex-wrap gap-1 mt-2">
+                                              {participant.skills
+                                                .slice(0, 3)
+                                                .map((skill, idx) => (
+                                                  <span
+                                                    key={idx}
+                                                    className="inline-block bg-blue-500/20 text-blue-400 text-xs px-2 py-1 rounded"
+                                                  >
+                                                    {skill}
+                                                  </span>
+                                                ))}
+                                              {participant.skills.length >
+                                                3 && (
+                                                <span className="text-gray-400 text-xs">
+                                                  +
+                                                  {participant.skills.length -
+                                                    3}{" "}
+                                                  more
+                                                </span>
+                                              )}
+                                            </div>
+                                          )}
+                                      </div>
+                                      {participant.status === "pending" && (
+                                        <div className="flex gap-2">
+                                          <Button
+                                            onClick={() =>
+                                              handleParticipantAction(
+                                                hackathon.id,
+                                                participant.id,
+                                                "approved"
+                                              )
+                                            }
+                                            size="sm"
+                                            className="bg-green-500/20 text-green-400 hover:bg-green-500/30 border-green-500/30"
+                                          >
+                                            <FaCheckCircle />
+                                          </Button>
+                                          <Button
+                                            onClick={() =>
+                                              handleParticipantAction(
+                                                hackathon.id,
+                                                participant.id,
+                                                "rejected"
+                                              )
+                                            }
+                                            size="sm"
+                                            className="bg-red-500/20 text-red-400 hover:bg-red-500/30 border-red-500/30"
+                                          >
+                                            <FaTimesCircle />
+                                          </Button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card className="glass-dark text-center py-16">
+                <CardContent>
+                  <FaTrophy className="mx-auto h-16 w-16 text-gray-400 mb-6" />
+                  <h3 className="text-2xl font-bold text-white mb-4">
+                    No Hackathons Created
+                  </h3>
+                  <p className="text-gray-400 mb-8 max-w-md mx-auto">
+                    You haven't created any hackathons yet. Start by creating
+                    your first hackathon and building a community!
+                  </p>
+                  <Button asChild variant="cyber" size="lg">
+                    <Link to="/create-hackathon">
+                      <FaPlus className="mr-2" />
+                      Create Your First Hackathon
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+
+        {activeTab === "achievements" && (
+          <Card className="glass-dark text-center py-16">
+            <CardContent>
+              <FaAward className="mx-auto h-16 w-16 text-gray-400 mb-6" />
+              <h3 className="text-2xl font-bold text-white mb-4">
+                Achievements Coming Soon
+              </h3>
+              <p className="text-gray-400 mb-8 max-w-md mx-auto">
+                We're working on an exciting achievements system to recognize
+                your hackathon journey!
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {activeTab === "profile" && (
+          <Card className="glass-dark">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center">
+                <FaUser className="mr-2 text-blue-400" />
+                Profile Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm text-gray-500">Name</p>
-                  <p className="font-medium">{user.name || 'User'}</p>
+                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                    Name
+                  </label>
+                  <div className="p-3 bg-gray-800/50 rounded-lg text-white">
+                    {user.name}
+                  </div>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium">{user.email || 'No email provided'}</p>
+                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                    Email
+                  </label>
+                  <div className="p-3 bg-gray-800/50 rounded-lg text-white">
+                    {user.email}
+                  </div>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Role</p>
-                  <p className="font-medium capitalize">{user.role || 'Participant'}</p>
+                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                    Role
+                  </label>
+                  <div className="p-3 bg-gray-800/50 rounded-lg text-white capitalize">
+                    {user.role}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                    Member Since
+                  </label>
+                  <div className="p-3 bg-gray-800/50 rounded-lg text-white">
+                    {user.createdAt ? formatDate(user.createdAt) : "N/A"}
+                  </div>
                 </div>
               </div>
-              
-              <div className="mt-8 border-t pt-6">
-                <h3 className="text-lg font-medium mb-4">Privacy and Security</h3>
-                <button className="text-blue-600 hover:text-blue-800 transition">
-                  Change Password
-                </button>
+              <div className="mt-8 flex gap-4">
+                <Button variant="cyber">Update Profile</Button>
+                <Button variant="glass">Change Password</Button>
+                <Button
+                  onClick={logout}
+                  variant="outline"
+                  className="text-red-400 border-red-400 hover:bg-red-500/10"
+                >
+                  <FaSignOutAlt className="mr-2" />
+                  Logout
+                </Button>
               </div>
-            </div>
-          )}
-        </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
 };
 
-export default Dashboard; 
+export default Dashboard;
