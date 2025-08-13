@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { FaStar, FaQuoteLeft, FaUser } from "react-icons/fa";
 import { Card, CardContent } from "./ui/card";
+import FloatingCard3D from "./FloatingCard3D";
 
 const testimonials = [
   {
@@ -82,56 +83,61 @@ const TestimonialCard = ({
   index: number;
 }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      viewport={{ once: true }}
-    >
-      <Card className="card-3d glass-dark h-full">
-        <CardContent className="p-6">
-          <div className="flex items-start space-x-4 mb-4">
-            <div className="relative">
-              {testimonial.avatar ? (
-                <img
-                  src={testimonial.avatar}
-                  alt={testimonial.name}
-                  className="w-12 h-12 rounded-full object-cover border-2 border-blue-500/30"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                    e.currentTarget.nextElementSibling?.classList.remove(
-                      "hidden"
-                    );
-                  }}
-                />
-              ) : null}
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center hidden">
-                <FaUser className="text-white text-lg" />
+    <FloatingCard3D intensity={0.4} className="h-full">
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: index * 0.1 }}
+        viewport={{ once: true }}
+      >
+        <Card className="card-3d glass-dark h-full">
+          <CardContent className="p-6">
+            <div className="flex items-start space-x-4 mb-4">
+              <div className="relative">
+                {testimonial.avatar ? (
+                  <img
+                    src={testimonial.avatar}
+                    alt={testimonial.name}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-blue-500/30"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      const fallback = e.currentTarget
+                        .nextElementSibling as HTMLElement;
+                      if (fallback) {
+                        fallback.classList.remove("hidden");
+                        fallback.classList.add("flex");
+                      }
+                    }}
+                  />
+                ) : null}
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 items-center justify-center hidden">
+                  <FaUser className="text-white text-lg" />
+                </div>
               </div>
+              <div className="flex-1">
+                <h4 className="text-white font-semibold">{testimonial.name}</h4>
+                <p className="text-gray-400 text-sm">{testimonial.role}</p>
+                <p className="text-blue-400 text-sm">{testimonial.company}</p>
+              </div>
+              <StarRating rating={testimonial.rating} />
             </div>
-            <div className="flex-1">
-              <h4 className="text-white font-semibold">{testimonial.name}</h4>
-              <p className="text-gray-400 text-sm">{testimonial.role}</p>
-              <p className="text-blue-400 text-sm">{testimonial.company}</p>
-            </div>
-            <StarRating rating={testimonial.rating} />
-          </div>
 
-          <div className="relative">
-            <FaQuoteLeft className="absolute -top-2 -left-2 text-blue-500/30 text-2xl" />
-            <p className="text-gray-300 leading-relaxed pl-6">
-              {testimonial.text}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+            <div className="relative">
+              <FaQuoteLeft className="absolute -top-2 -left-2 text-blue-500/30 text-2xl" />
+              <p className="text-gray-300 leading-relaxed pl-6">
+                {testimonial.text}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </FloatingCard3D>
   );
 };
 
 const Testimonials = () => {
   return (
-    <section className="py-20">
+    <section className="py-20 bg-black cyber-grid">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl sm:text-5xl font-extrabold text-white mb-6">

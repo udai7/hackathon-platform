@@ -20,6 +20,7 @@ import {
 } from "../components/ui/card";
 import FAQ from "../components/FAQ";
 import Testimonials from "../components/Testimonials";
+import FloatingCard3D from "../components/FloatingCard3D";
 
 const Home = () => {
   const { user } = useAuth();
@@ -122,7 +123,7 @@ const Home = () => {
 
       {/* Choose Your Path Section - Enhanced with 3D Effects */}
       {!user && (
-        <section className="relative py-32 bg-gradient-to-b from-gray-900 to-black">
+        <section className="relative py-32 bg-black cyber-grid">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -147,7 +148,7 @@ const Home = () => {
             </motion.div>
 
             <div className="grid gap-12 lg:grid-cols-2 max-w-6xl mx-auto">
-              <div className="h-full">
+              <FloatingCard3D className="h-full" intensity={0.6}>
                 <Card className="card-3d glass-dark group h-full border-2 border-white/10 hover:border-white/30 transition-all duration-300">
                   <CardHeader className="text-center pb-6">
                     <motion.div
@@ -178,9 +179,9 @@ const Home = () => {
                     </Button>
                   </CardContent>
                 </Card>
-              </div>
+              </FloatingCard3D>
 
-              <div className="h-full">
+              <FloatingCard3D className="h-full" intensity={0.6}>
                 <Card className="card-3d glass-dark group h-full border-2 border-white/10 hover:border-white/30 transition-all duration-300">
                   <CardHeader className="text-center pb-6">
                     <motion.div
@@ -210,14 +211,14 @@ const Home = () => {
                     </Button>
                   </CardContent>
                 </Card>
-              </div>
+              </FloatingCard3D>
             </div>
           </div>
         </section>
       )}
 
       {/* Features Section - Enhanced with Clear Distinction */}
-      <section className="relative py-32 bg-black">
+      <section className="relative py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -243,7 +244,7 @@ const Home = () => {
           </motion.div>
 
           <div className="grid gap-12 md:grid-cols-3">
-            <div>
+            <FloatingCard3D intensity={0.5}>
               <Card className="card-3d glass-dark group text-center h-full border-2 border-white/10 hover:border-white/30 transition-all duration-300">
                 <CardHeader className="pb-6">
                   <motion.div
@@ -263,9 +264,9 @@ const Home = () => {
                   </p>
                 </CardContent>
               </Card>
-            </div>
+            </FloatingCard3D>
 
-            <div>
+            <FloatingCard3D intensity={0.5}>
               <Card className="card-3d glass-dark group text-center h-full border-2 border-white/10 hover:border-white/30 transition-all duration-300">
                 <CardHeader className="pb-6">
                   <motion.div
@@ -285,9 +286,9 @@ const Home = () => {
                   </p>
                 </CardContent>
               </Card>
-            </div>
+            </FloatingCard3D>
 
-            <div>
+            <FloatingCard3D intensity={0.5}>
               <Card className="card-3d glass-dark group text-center h-full border-2 border-white/10 hover:border-white/30 transition-all duration-300">
                 <CardHeader className="pb-6">
                   <motion.div
@@ -307,7 +308,7 @@ const Home = () => {
                   </p>
                 </CardContent>
               </Card>
-            </div>
+            </FloatingCard3D>
           </div>
         </div>
       </section>
