@@ -2,8 +2,6 @@
 
 <div align="center">
 
-![HackPub Logo](public/hackpub-logo.png)
-
 **A sleek, modern platform for creating, managing, and participating in hackathons worldwide**
 
 [![React](https://img.shields.io/badge/React-18.2.0-blue.svg)](https://reactjs.org/)
