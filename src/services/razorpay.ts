@@ -1,14 +1,14 @@
-import Razorpay from 'razorpay';
-import { v4 as uuidv4 } from 'uuid';
-import dotenv from 'dotenv';
-import crypto from 'crypto';
+import Razorpay from "razorpay";
+import { v4 as uuidv4 } from "uuid";
+import dotenv from "dotenv";
+import crypto from "crypto";
 
 dotenv.config();
 
 // Initialize Razorpay with API keys from environment variables
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || '',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || ''
+  key_id: import.meta.env.VITE_RAZORPAY_KEY_ID || "",
+  key_secret: import.meta.env.VITE_RAZORPAY_KEY_SECRET || "",
 });
 
 /**
@@ -21,14 +21,14 @@ export const createOrder = async (amount: number, receiptId: string) => {
   try {
     const options = {
       amount: amount * 100, // Razorpay expects amount in paise
-      currency: 'INR',
+      currency: "INR",
       receipt: receiptId,
-      payment_capture: 1 // Auto-capture payment
+      payment_capture: 1, // Auto-capture payment
     };
 
     return await razorpay.orders.create(options);
   } catch (error) {
-    console.error('Error creating Razorpay order:', error);
+    console.error("Error creating Razorpay order:", error);
     throw error;
   }
 };
@@ -40,16 +40,23 @@ export const createOrder = async (amount: number, receiptId: string) => {
  * @param signature Razorpay signature from callback
  * @returns Boolean indicating if signature is valid
  */
-export const verifyPaymentSignature = (orderId: string, paymentId: string, signature: string) => {
+export const verifyPaymentSignature = (
+  orderId: string,
+  paymentId: string,
+  signature: string
+) => {
   try {
     // Generate signature based on the order ID and payment ID
-    const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || '');
-    hmac.update(orderId + '|' + paymentId);
-    const generatedSignature = hmac.digest('hex');
-    
+    const hmac = crypto.createHmac(
+      "sha256",
+      import.meta.env.VITE_RAZORPAY_KEY_SECRET || ""
+    );
+    hmac.update(orderId + "|" + paymentId);
+    const generatedSignature = hmac.digest("hex");
+
     return generatedSignature === signature;
   } catch (error) {
-    console.error('Error verifying Razorpay signature:', error);
+    console.error("Error verifying Razorpay signature:", error);
     return false;
   }
 };
@@ -59,11 +66,11 @@ export const verifyPaymentSignature = (orderId: string, paymentId: string, signa
  * @returns String receipt ID
  */
 export const generateReceiptId = () => {
-  return `rcpt_${uuidv4().replace(/-/g, '').substring(0, 10)}`;
+  return `rcpt_${uuidv4().replace(/-/g, "").substring(0, 10)}`;
 };
 
 export default {
   createOrder,
   verifyPaymentSignature,
-  generateReceiptId
-}; 
+  generateReceiptId,
+};

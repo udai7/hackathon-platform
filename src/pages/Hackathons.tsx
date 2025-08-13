@@ -83,7 +83,7 @@ const Hackathons = () => {
                   placeholder="Search hackathons..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="input-modern pl-10"
+                  className="input-modern pl-10 h-10 text-base"
                 />
               </div>
 
@@ -95,7 +95,7 @@ const Hackathons = () => {
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="input-modern pl-10 appearance-none cursor-pointer"
+                    className="input-modern pl-10 appearance-none cursor-pointer h-10 text-base"
                   >
                     {categories.map((category) => (
                       <option
@@ -114,9 +114,10 @@ const Hackathons = () => {
                 onClick={resetFilters}
                 variant="glass"
                 size="default"
-                className="md:w-auto flex items-center"
+                className="md:w-auto flex items-center gap-2 h-10 px-4 text-sm"
               >
-                <FaTimes className="mr-2 w-4 h-4" /> Clear Filters
+                <FaTimes className="w-4 h-4 text-white" />
+                <span>Clear Filters</span>
               </Button>
             </div>
           </CardContent>

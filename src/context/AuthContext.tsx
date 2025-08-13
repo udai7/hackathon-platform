@@ -146,8 +146,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // Initialize admin account if it doesn't exist
       const users = JSON.parse(localStorage.getItem("users") || "[]");
       // Initialize admin account from environment variables
-      const adminEmail = process.env.ADMIN_EMAIL || "admin@hackpub.com";
-      const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+      const adminEmail =
+        import.meta.env.VITE_ADMIN_EMAIL || "admin@hackpub.com";
+      const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || "admin123";
 
       const adminExists = users.some(
         (u: { email: string; role: string }) =>

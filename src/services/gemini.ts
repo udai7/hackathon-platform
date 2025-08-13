@@ -1,6 +1,6 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || "");
 
 interface ProjectEvaluation {
   score: number;
@@ -24,7 +24,7 @@ export const evaluateProject = async (
   githubLink: string
 ): Promise<ProjectEvaluation> => {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     const prompt = `As an expert technical evaluator, analyze this hackathon project:
     Project Description: ${projectDescription}
@@ -66,25 +66,31 @@ export const evaluateProject = async (
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    
+
     // Parse the JSON response
     const evaluation = JSON.parse(text);
-    
+
     return evaluation;
   } catch (error) {
-    console.error('Error evaluating project:', error);
-    throw new Error('Failed to evaluate project');
+    console.error("Error evaluating project:", error);
+    throw new Error("Failed to evaluate project");
   }
 };
 
-export const rankProjects = async (projects: Array<{ description: string; githubLink: string }>): Promise<Array<{ index: number; score: number; feedback: string }>> => {
+export const rankProjects = async (
+  projects: Array<{ description: string; githubLink: string }>
+): Promise<Array<{ index: number; score: number; feedback: string }>> => {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     const prompt = `Compare and rank these hackathon projects:
-    ${projects.map((p, i) => `Project ${i + 1}:
+    ${projects
+      .map(
+        (p, i) => `Project ${i + 1}:
     Description: ${p.description}
-    GitHub: ${p.githubLink}`).join('\n\n')}
+    GitHub: ${p.githubLink}`
+      )
+      .join("\n\n")}
     
     Please rank these projects based on:
     1. Overall technical merit
@@ -109,18 +115,18 @@ export const rankProjects = async (projects: Array<{ description: string; github
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    
+
     // Parse the JSON response
     const rankings = JSON.parse(text);
-    
+
     return rankings;
   } catch (error) {
-    console.error('Error ranking projects:', error);
-    throw new Error('Failed to rank projects');
+    console.error("Error ranking projects:", error);
+    throw new Error("Failed to rank projects");
   }
 };
 
 export default {
   evaluateProject,
-  rankProjects
-}; 
+  rankProjects,
+};

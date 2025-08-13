@@ -4,7 +4,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const MONGODB_URI =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/hackathon-platform";
+  import.meta.env.VITE_MONGODB_URI ||
+  "mongodb://localhost:27017/hackathon-platform";
 
 // Connection options with reasonable timeouts
 // const options = {
