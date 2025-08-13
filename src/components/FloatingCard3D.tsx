@@ -65,8 +65,6 @@ const FloatingCard3D = ({
         transformStyle: "preserve-3d",
       }}
       className={`relative transition-all duration-200 ${className}`}
-      whileHover={{ scale: 1.05 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       <div
         style={{

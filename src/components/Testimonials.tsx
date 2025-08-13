@@ -90,7 +90,7 @@ const TestimonialCard = ({
         transition={{ duration: 0.5, delay: index * 0.1 }}
         viewport={{ once: true }}
       >
-        <Card className="card-3d glass-dark h-full">
+        <Card className="glass-dark h-full border-2 border-white/10 hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-400/20 transition-all duration-300">
           <CardContent className="p-6">
             <div className="flex items-start space-x-4 mb-4">
               <div className="relative">

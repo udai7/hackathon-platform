@@ -40,7 +40,7 @@ const HackathonCard: FC<HackathonCardProps> = ({ hackathon }) => {
 
   return (
     <FloatingCard3D className="h-full" intensity={0.8}>
-      <Card className="card-3d glass-dark overflow-hidden h-full group">
+      <Card className="glass-dark overflow-hidden h-full group border-2 border-white/10 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-400/20 transition-all duration-300">
         {/* Card Image */}
         <div className="h-48 overflow-hidden relative">
           <img

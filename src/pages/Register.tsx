@@ -110,7 +110,7 @@ const Register = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <Card className="glass-dark relative transform-gpu">
+        <Card className="glass-dark relative transform-gpu border-2 border-white/10 hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-400/20 transition-all duration-300">
           <CardHeader>
             <CardTitle className="text-center text-white flex items-center justify-center">
               {role === "host" ? (

@@ -149,7 +149,7 @@ const Home = () => {
 
             <div className="grid gap-12 lg:grid-cols-2 max-w-6xl mx-auto">
               <FloatingCard3D className="h-full" intensity={0.6}>
-                <Card className="card-3d glass-dark group h-full border-2 border-white/10 hover:border-white/30 transition-all duration-300">
+                <Card className="glass-dark group h-full border-2 border-white/10 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-400/20 transition-all duration-300">
                   <CardHeader className="text-center pb-6">
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
@@ -182,7 +182,7 @@ const Home = () => {
               </FloatingCard3D>
 
               <FloatingCard3D className="h-full" intensity={0.6}>
-                <Card className="card-3d glass-dark group h-full border-2 border-white/10 hover:border-white/30 transition-all duration-300">
+                <Card className="glass-dark group h-full border-2 border-white/10 hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-400/20 transition-all duration-300">
                   <CardHeader className="text-center pb-6">
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: -5 }}
@@ -245,7 +245,7 @@ const Home = () => {
 
           <div className="grid gap-12 md:grid-cols-3">
             <FloatingCard3D intensity={0.5}>
-              <Card className="card-3d glass-dark group text-center h-full border-2 border-white/10 hover:border-white/30 transition-all duration-300">
+              <Card className="glass-dark group text-center h-full border-2 border-white/10 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-400/20 transition-all duration-300">
                 <CardHeader className="pb-6">
                   <motion.div
                     whileHover={{ scale: 1.2, rotate: 10 }}
@@ -267,7 +267,7 @@ const Home = () => {
             </FloatingCard3D>
 
             <FloatingCard3D intensity={0.5}>
-              <Card className="card-3d glass-dark group text-center h-full border-2 border-white/10 hover:border-white/30 transition-all duration-300">
+              <Card className="glass-dark group text-center h-full border-2 border-white/10 hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-400/20 transition-all duration-300">
                 <CardHeader className="pb-6">
                   <motion.div
                     whileHover={{ scale: 1.2, rotate: -10 }}
@@ -289,7 +289,7 @@ const Home = () => {
             </FloatingCard3D>
 
             <FloatingCard3D intensity={0.5}>
-              <Card className="card-3d glass-dark group text-center h-full border-2 border-white/10 hover:border-white/30 transition-all duration-300">
+              <Card className="glass-dark group text-center h-full border-2 border-white/10 hover:border-green-400/50 hover:shadow-lg hover:shadow-green-400/20 transition-all duration-300">
                 <CardHeader className="pb-6">
                   <motion.div
                     whileHover={{ scale: 1.2, rotate: 5 }}
