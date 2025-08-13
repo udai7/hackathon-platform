@@ -4,13 +4,13 @@ import { AuthProvider } from "./context/AuthContext";
 import { HackathonProvider } from "./context/HackathonContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import ParticleBackground from "./components/ParticleBackground";
+// import ThreeBackground from "./components/ThreeBackground";
 import SessionStatus from "./components/SessionStatus";
 import Home from "./pages/Home";
 import Hackathons from "./pages/Hackathons";
 import HackathonDetails from "./pages/HackathonDetails";
 import CreateHackathon from "./pages/CreateHackathon";
-import Login from "./pages/Login";
+import Login from "./pages/Login"; 
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import SubmitProject from "./pages/SubmitProject";
@@ -24,7 +24,19 @@ function App() {
         <AuthProvider>
           <HackathonProvider>
             <div className="flex flex-col min-h-screen w-full overflow-x-hidden relative">
-              <ParticleBackground />
+              <div className="particles fixed inset-0 pointer-events-none z-0">
+                {[...Array(50)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="particle"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      animationDelay: `${Math.random() * 20}s`,
+                      animationDuration: `${15 + Math.random() * 10}s`,
+                    }}
+                  />
+                ))}
+              </div>
               <SessionStatus />
               <Navbar />
               <main className="flex-grow w-full relative z-10">
