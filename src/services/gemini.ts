@@ -1,6 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || "");
+const genAI = new GoogleGenerativeAI(
+  process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || ""
+);
 
 interface ProjectEvaluation {
   score: number;

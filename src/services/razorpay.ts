@@ -7,8 +7,11 @@ dotenv.config();
 
 // Initialize Razorpay with API keys from environment variables
 const razorpay = new Razorpay({
-  key_id: import.meta.env.VITE_RAZORPAY_KEY_ID || "",
-  key_secret: import.meta.env.VITE_RAZORPAY_KEY_SECRET || "",
+  key_id: process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID || "",
+  key_secret:
+    process.env.RAZORPAY_KEY_SECRET ||
+    process.env.VITE_RAZORPAY_KEY_SECRET ||
+    "",
 });
 
 /**
@@ -49,7 +52,9 @@ export const verifyPaymentSignature = (
     // Generate signature based on the order ID and payment ID
     const hmac = crypto.createHmac(
       "sha256",
-      import.meta.env.VITE_RAZORPAY_KEY_SECRET || ""
+      process.env.RAZORPAY_KEY_SECRET ||
+        process.env.VITE_RAZORPAY_KEY_SECRET ||
+        ""
     );
     hmac.update(orderId + "|" + paymentId);
     const generatedSignature = hmac.digest("hex");

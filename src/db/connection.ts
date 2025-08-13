@@ -4,19 +4,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const MONGODB_URI =
-  import.meta.env.VITE_MONGODB_URI ||
+  process.env.MONGODB_URI ||
+  process.env.VITE_MONGODB_URI ||
   "mongodb://localhost:27017/hackathon-platform";
 
-// Connection options with reasonable timeouts
-// const options = {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-//   connectTimeoutMS: 10000, // 10 seconds
-//   serverSelectionTimeoutMS: 10000, // 10 seconds
-//   heartbeatFrequencyMS: 5000, // 5 seconds
-// };
-
-// Connection function with better error reporting
 export const connectDB = async (): Promise<void> => {
   try {
     mongoose.set("strictQuery", false);
