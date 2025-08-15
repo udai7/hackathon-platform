@@ -1,3 +1,14 @@
+/* Custom number input spinner for dark mode */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  background: rgba(17, 24, 39, 0.5) !important; /* matches input-modern bg */
+  color: #888 !important;
+  border-radius: 2px;
+  border: none;
+}
+input[type="number"] {
+  color-scheme: dark;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

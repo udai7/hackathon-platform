@@ -56,7 +56,7 @@ export interface Participant {
   teamName?: string;
   teammates?: string[];
   submissionDate: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "enrolled";
   paymentStatus?: "pending" | "completed" | "failed" | "not_required";
   paymentId?: string;
   hackathonPaymentRequired?: boolean;

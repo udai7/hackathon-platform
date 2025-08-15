@@ -152,15 +152,27 @@ const CreateHackathon = () => {
       "startDate",
       "endDate",
       "category",
+      "registrationFee",
     ];
     requiredFields.forEach((field) => {
-      if (!formData[field as keyof typeof formData]) {
+      if (
+        !formData[field as keyof typeof formData] &&
+        field !== "registrationFee"
+      ) {
         newErrors[field] = `${
           field.charAt(0).toUpperCase() +
           field.slice(1).replace(/([A-Z])/g, " $1")
         } is required`;
       }
     });
+    // Registration fee validation
+    const fee = Number(formData.registrationFee);
+    if (formData.registrationFee === "") {
+      newErrors.registrationFee =
+        "Registration fee is required (0 for Free, 1-500 for paid)";
+    } else if (isNaN(fee) || fee < 0 || fee > 500) {
+      newErrors.registrationFee = "Enter a number between 0 and 500";
+    }
 
     if (formData.startDate && formData.endDate) {
       const startDate = new Date(formData.startDate);
@@ -627,17 +639,41 @@ const CreateHackathon = () => {
                         htmlFor="registrationFee"
                         className="block text-sm font-medium text-gray-300 mb-2"
                       >
-                        Registration Fee
+                        Registration Fee (Enter 0 for Free, or 1-500)
                       </label>
                       <Input
-                        type="text"
+                        type="number"
                         id="registrationFee"
                         name="registrationFee"
+                        min={0}
+                        max={500}
                         value={formData.registrationFee}
-                        onChange={handleChange}
-                        className="input-modern"
-                        placeholder="e.g. 'Free' or '₹500'"
+                        onChange={(e) => {
+                          let val = e.target.value;
+                          // Only allow numbers between 0 and 500
+                          if (val === "") {
+                            setFormData((prev) => ({
+                              ...prev,
+                              registrationFee: "",
+                            }));
+                          } else {
+                            let num = Math.max(0, Math.min(500, Number(val)));
+                            setFormData((prev) => ({
+                              ...prev,
+                              registrationFee: num.toString(),
+                            }));
+                          }
+                        }}
+                        className={`input-modern ${
+                          errors.registrationFee ? "border-red-500" : ""
+                        }`}
+                        placeholder="0 for Free, 1-500 for paid"
                       />
+                      {errors.registrationFee && (
+                        <p className="mt-1 text-sm text-red-400">
+                          {errors.registrationFee}
+                        </p>
+                      )}
                     </div>
 
                     {/* Website */}

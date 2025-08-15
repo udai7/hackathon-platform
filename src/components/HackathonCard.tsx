@@ -39,14 +39,14 @@ const HackathonCard: FC<HackathonCardProps> = ({ hackathon }) => {
   } = hackathon;
 
   return (
-    <FloatingCard3D className="h-full" intensity={0.8}>
-      <Card className="glass-dark overflow-hidden h-full group border-2 border-white/10 hover:border-blue-400/50 hover:shadow-lg hover:shadow-blue-400/20 transition-all duration-300">
+    <div className="h-full">
+      <Card className="glass-dark overflow-hidden h-full group border-2 border-white/10 hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-400/20 transition-all duration-300">
         {/* Card Image */}
         <div className="h-48 overflow-hidden relative">
           <img
             src={image || "/default-hackathon.jpg"}
             alt={title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           <div className="absolute top-0 right-0 m-3">
@@ -64,9 +64,7 @@ const HackathonCard: FC<HackathonCardProps> = ({ hackathon }) => {
 
         {/* Card Content */}
         <CardHeader className="pb-3">
-          <CardTitle className="text-white group-hover:text-blue-400 transition-colors duration-300 line-clamp-2">
-            {title}
-          </CardTitle>
+          <CardTitle className="text-white line-clamp-2">{title}</CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-3">
@@ -101,15 +99,12 @@ const HackathonCard: FC<HackathonCardProps> = ({ hackathon }) => {
 
         {/* Action Button */}
         <CardFooter className="pt-0">
-          <Button
-            variant="cyber"
-            className="w-full group-hover:shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300"
-          >
+          <Button variant="cyber" className="w-full">
             View Details
           </Button>
         </CardFooter>
       </Card>
-    </FloatingCard3D>
+    </div>
   );
 };
 

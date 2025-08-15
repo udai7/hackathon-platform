@@ -407,7 +407,11 @@ const HackathonDetails = () => {
           .map((teammate) => teammate.trim())
           .filter((teammate) => teammate !== ""),
         submissionDate: new Date().toISOString(),
-        status: "pending",
+        status:
+          parseInt(hackathon.registrationFee || "0") === 0 ||
+          (hackathon.registrationFee || "").toLowerCase().includes("free")
+            ? "enrolled"
+            : "pending",
       };
 
       // Register participant using the API service instead of directly updating the hackathon
