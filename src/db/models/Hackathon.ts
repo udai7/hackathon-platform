@@ -29,6 +29,7 @@ const ParticipantSchema = new mongoose.Schema({
   paymentId: { type: String },
   projectSubmission: {
     githubLink: { type: String },
+    liveUrl: { type: String },
     projectDescription: { type: String },
     submissionDate: { type: Date },
     evaluation: {

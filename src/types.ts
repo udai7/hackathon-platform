@@ -66,6 +66,7 @@ export interface Participant {
   upiId?: string;
   projectSubmission?: {
     githubLink: string;
+    liveUrl?: string;
     projectDescription: string;
     submissionDate: Date;
     evaluation?: {
