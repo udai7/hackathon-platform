@@ -65,6 +65,15 @@
       0 0 0 1px rgba(99, 102, 241, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
+  /* Disable 3D hover for elements with .no-hover alongside .card-3d
+     This allows specific cards (like the Create Hackathon form) to opt out
+     without removing the global effect. */
+  .card-3d.no-hover:hover {
+    @apply scale-100;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
   /* Glassmorphism Effect */
   .glass {
     @apply backdrop-blur-xl bg-white/5 border border-white/10;

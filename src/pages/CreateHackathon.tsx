@@ -388,7 +388,7 @@ const CreateHackathon = () => {
               </CardHeader>
             </Card>
 
-            <Card className="card-3d glass-dark">
+            <Card className="card-3d glass-dark no-hover border-2 border-white/10 hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-400/20 transition-all duration-300">
               <CardContent className="p-8">
                 <form onSubmit={handleSubmit}>
                   {errors.submit && (
