@@ -267,6 +267,9 @@ const HackathonDetails = () => {
               (p) => p.userId === user.id
             );
             setIsUserRegistered(!!userParticipation);
+            if (userParticipation) {
+              setRegisteredParticipant(userParticipation);
+            }
           }
         } else {
           setHackathon(null);
@@ -444,6 +447,15 @@ const HackathonDetails = () => {
         );
         if (updatedHackathon) {
           setHackathon(updatedHackathon);
+          // Set registeredParticipant to the current user's participant object
+          if (user && updatedHackathon.participants) {
+            const userParticipation = updatedHackathon.participants.find(
+              (p) => p.userId === user.id
+            );
+            if (userParticipation) {
+              setRegisteredParticipant(userParticipation);
+            }
+          }
         }
 
         // Mark user as registered
