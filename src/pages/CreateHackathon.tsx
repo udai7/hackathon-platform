@@ -469,7 +469,7 @@ const CreateHackathon = () => {
                         htmlFor="startDate"
                         className="block text-sm font-medium text-gray-300 mb-2"
                       >
-                        <FaCalendarAlt className="inline mr-2 text-blue-400" />
+                        <FaCalendarAlt className="inline mr-2 text-white" />
                         Start Date*
                       </label>
                       <Input
@@ -495,7 +495,7 @@ const CreateHackathon = () => {
                         htmlFor="endDate"
                         className="block text-sm font-medium text-gray-300 mb-2"
                       >
-                        <FaCalendarAlt className="inline mr-2 text-blue-400" />
+                        <FaCalendarAlt className="inline mr-2 text-white" />
                         End Date*
                       </label>
                       <Input
@@ -521,7 +521,7 @@ const CreateHackathon = () => {
                         htmlFor="registrationDeadline"
                         className="block text-sm font-medium text-gray-300 mb-2"
                       >
-                        <FaCalendarAlt className="inline mr-2 text-blue-400" />
+                        <FaCalendarAlt className="inline mr-2 text-white" />
                         Registration Deadline
                       </label>
                       <Input
