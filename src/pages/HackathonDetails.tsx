@@ -631,6 +631,19 @@ const HackathonDetails = () => {
         registeredParticipant.id,
         submission
       );
+      // Refresh hackathon data so the new submission appears in the UI
+      const updated = await hackathonService.getHackathonById(hackathon!.id);
+      if (updated) {
+        setHackathon(updated);
+        // update registered participant reference from updated data
+        const updatedParticipant = updated.participants?.find(
+          (p) =>
+            p.id === registeredParticipant.id ||
+            p.userId === registeredParticipant.userId
+        );
+        if (updatedParticipant) setRegisteredParticipant(updatedParticipant);
+      }
+
       setProjectSubmissionSuccess(true);
       setShowProjectSubmission(false);
 
@@ -1379,72 +1392,81 @@ const HackathonDetails = () => {
                   Project Submissions
                 </h2>
 
-                {hackathon.submissions && hackathon.submissions.length > 0 ? (
+                {/* Derive submissions from participants' projectSubmission */}
+                {hackathon.participants &&
+                hackathon.participants.some((p) => p.projectSubmission) ? (
                   <div className="space-y-6">
-                    {hackathon.submissions.map((submission: Submission) => (
-                      <div
-                        key={submission.id}
-                        className="bg-white/10 rounded-lg p-6 border border-white/20"
-                      >
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <h3 className="text-xl font-semibold text-white mb-1">
-                              {submission.projectTitle || "Project Submission"}
-                            </h3>
-                            <p className="text-gray-300 mb-1">
-                              <span className="font-medium">Team:</span>{" "}
-                              {submission.teamName}
-                            </p>
-                            {submission.participantName && (
-                              <p className="text-gray-300 mb-1">
-                                <span className="font-medium">
-                                  Submitted by:
-                                </span>{" "}
-                                {submission.participantName}
-                              </p>
-                            )}
-                            {submission.participantEmail && (
-                              <p className="text-gray-300 mb-1">
-                                <span className="font-medium">Contact:</span>{" "}
-                                {submission.participantEmail}
-                              </p>
-                            )}
-                          </div>
-                          <span className="flex items-center text-gray-400 text-sm">
-                            <FaClock className="mr-2" />
-                            {new Date(
-                              submission.submissionDate
-                            ).toLocaleDateString()}
-                          </span>
-                        </div>
-
-                        <p className="text-gray-300 mb-4">
-                          {submission.description}
-                        </p>
-
-                        <div className="flex flex-wrap gap-4">
-                          <a
-                            href={submission.githubLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center text-gray-300 hover:text-blue-400 transition-colors"
+                    {hackathon.participants
+                      .filter((p) => p.projectSubmission)
+                      .map((p) => {
+                        const submission = p.projectSubmission as any;
+                        return (
+                          <div
+                            key={p.id}
+                            className="bg-white/10 rounded-lg p-6 border border-white/20"
                           >
-                            <FaGithub className="mr-2" /> GitHub Repository
-                          </a>
+                            <div className="flex justify-between items-start mb-4">
+                              <div>
+                                <h3 className="text-xl font-semibold text-white mb-1">
+                                  {submission.projectTitle ||
+                                    "Project Submission"}
+                                </h3>
+                                <p className="text-gray-300 mb-1">
+                                  <span className="font-medium">Team:</span>{" "}
+                                  {p.teamName || "—"}
+                                </p>
+                                <p className="text-gray-300 mb-1">
+                                  <span className="font-medium">
+                                    Submitted by:
+                                  </span>{" "}
+                                  {p.name}
+                                </p>
+                                <p className="text-gray-300 mb-1">
+                                  <span className="font-medium">Contact:</span>{" "}
+                                  {p.email}
+                                </p>
+                              </div>
+                              <span className="flex items-center text-gray-400 text-sm">
+                                <FaClock className="mr-2" />
+                                {submission.submissionDate
+                                  ? new Date(
+                                      submission.submissionDate
+                                    ).toLocaleDateString()
+                                  : "-"}
+                              </span>
+                            </div>
 
-                          {(submission.demoLink || submission.liveUrl) && (
-                            <a
-                              href={submission.demoLink || submission.liveUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center text-gray-300 hover:text-blue-400 transition-colors"
-                            >
-                              <FaLink className="mr-2" /> Live Demo
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                            <p className="text-gray-300 mb-4">
+                              {submission.projectDescription}
+                            </p>
+
+                            <div className="flex flex-wrap gap-4">
+                              {submission.githubLink && (
+                                <a
+                                  href={submission.githubLink}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center text-gray-300 hover:text-blue-400 transition-colors"
+                                >
+                                  <FaGithub className="mr-2" /> GitHub
+                                  Repository
+                                </a>
+                              )}
+
+                              {submission.liveUrl && (
+                                <a
+                                  href={submission.liveUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center text-gray-300 hover:text-blue-400 transition-colors"
+                                >
+                                  <FaLink className="mr-2" /> Live Demo
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
                   </div>
                 ) : (
                   <div className="text-center py-16 bg-white/10 rounded-lg border border-white/20">

@@ -529,21 +529,43 @@ const Dashboard = () => {
                               )}
                             </div>
 
-                            <div className="flex items-center">
-                              <span className="text-sm text-gray-400 mr-2">
-                                Status:
-                              </span>
-                              <span
-                                className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  participant.status === "approved"
-                                    ? "bg-green-500/20 text-green-400"
-                                    : participant.status === "rejected"
-                                    ? "bg-red-500/20 text-red-400"
-                                    : "bg-yellow-500/20 text-yellow-400"
-                                }`}
-                              >
-                                {participant.status}
-                              </span>
+                            <div className="flex items-center space-x-3">
+                              <div>
+                                <span className="text-sm text-gray-400 mr-2">
+                                  Status:
+                                </span>
+                                <span
+                                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    participant.status === "approved"
+                                      ? "bg-green-500/20 text-green-400"
+                                      : participant.status === "rejected"
+                                      ? "bg-red-500/20 text-red-400"
+                                      : "bg-yellow-500/20 text-yellow-400"
+                                  }`}
+                                >
+                                  {participant.status}
+                                </span>
+                              </div>
+
+                              {/* Submission indicator */}
+                              {participant.projectSubmission ? (
+                                <div className="text-sm text-gray-300">
+                                  <span className="font-medium">Submitted</span>
+                                  <span className="ml-2 text-xs text-gray-400">
+                                    •{" "}
+                                    <a
+                                      href={`/hackathon/${hackathon.id}#submissions`}
+                                      className="text-blue-400 hover:underline"
+                                    >
+                                      View
+                                    </a>
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="text-sm text-gray-500">
+                                  <span>No submission</span>
+                                </div>
+                              )}
                             </div>
                           </div>
 
