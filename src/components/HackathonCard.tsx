@@ -9,8 +9,6 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Button } from "./ui/button";
-import FloatingCard3D from "./FloatingCard3D";
-
 // Format date to display in a readable format
 const formatDate = (dateString: string) => {
   const options: Intl.DateTimeFormatOptions = {

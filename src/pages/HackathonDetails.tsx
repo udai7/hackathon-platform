@@ -46,7 +46,7 @@ interface Submission {
 // Extended interface that includes both required Hackathon and optional detail fields
 interface HackathonDetails extends Omit<Hackathon, "participants"> {
   longDescription?: string;
-  rules?: string[] | string;
+  rules?: string[];
   timeline?: Timeline[];
   submissions?: Submission[];
   prizeDetails?: Prize[];
@@ -203,7 +203,7 @@ const PaymentUI = ({
 const HackathonDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { allHackathons, deleteHackathon } = useHackathons();
+  const { deleteHackathon } = useHackathons();
   const { user } = useAuth();
   const [hackathon, setHackathon] = useState<HackathonDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -252,30 +252,32 @@ const HackathonDetails = () => {
   });
 
   useEffect(() => {
-    // Find the hackathon from the context
-    if (id && allHackathons) {
-      const foundHackathon = allHackathons.find((h) => h.id === id);
-      if (foundHackathon) {
-        // Convert to HackathonDetails type
-        const hackathonDetails: HackathonDetails = {
-          ...foundHackathon,
-          participantsCount: foundHackathon.participants?.length || 0,
-        };
-        setHackathon(hackathonDetails);
-
-        // Check if current user is already registered
-        if (user && foundHackathon.participants) {
-          const userParticipation = foundHackathon.participants.find(
-            (p) => p.userId === user.id
-          );
-          setIsUserRegistered(!!userParticipation);
+    let interval: NodeJS.Timeout | undefined;
+    const fetchHackathon = async () => {
+      if (id) {
+        // Always fetch latest from backend for participants
+        const latest = await hackathonService.getHackathonById(id);
+        if (latest) {
+          setHackathon({
+            ...latest,
+            participantsCount: latest.participants?.length || 0,
+          });
+          if (user && latest.participants) {
+            const userParticipation = latest.participants.find(
+              (p) => p.userId === user.id
+            );
+            setIsUserRegistered(!!userParticipation);
+          }
+        } else {
+          setHackathon(null);
         }
-      } else {
-        setHackathon(null);
+        setLoading(false);
       }
-      setLoading(false);
-    }
-  }, [id, allHackathons, user]);
+    };
+    fetchHackathon();
+    interval = setInterval(fetchHackathon, 5000); // Poll every 5 seconds
+    return () => interval && clearInterval(interval);
+  }, [id, user]);
 
   const handleDeleteHackathon = async () => {
     if (!hackathon || !id) return;
@@ -694,12 +696,17 @@ const HackathonDetails = () => {
   const isCreator = user && hackathon.creatorId === user.id;
 
   // Handler functions for editing
-  const handleAddRule = () => {
-    if (newRule.trim()) {
+  const handleAddRule = async () => {
+    if (newRule.trim() && hackathon) {
       const updatedRules = [...rulesArray, newRule.trim()];
       setNewRule("");
       // Update hackathon rules immediately for UI
       setHackathon((prev) => (prev ? { ...prev, rules: updatedRules } : null));
+      // Persist to backend
+      await hackathonService.updateHackathon({
+        ...hackathon,
+        rules: updatedRules,
+      });
     }
   };
 
@@ -725,13 +732,24 @@ const HackathonDetails = () => {
     );
   };
 
-  const handleAddPrize = () => {
-    if (newPrize.place && newPrize.amount && newPrize.description) {
+  const handleAddPrize = async () => {
+    if (
+      newPrize.place &&
+      newPrize.amount &&
+      newPrize.description &&
+      hackathon
+    ) {
       const updatedPrizes = [...prizesArray, newPrize];
       setNewPrize({ place: "", amount: "", description: "" });
       setHackathon((prev) =>
         prev ? { ...prev, prizeDetails: updatedPrizes } : null
       );
+      // Persist to backend
+      await hackathonService.updateHackathon({
+        ...hackathon,
+        prizeDetails: updatedPrizes,
+        rules: hackathon.rules || [],
+      });
     }
   };
 
@@ -768,10 +786,7 @@ const HackathonDetails = () => {
     ].filter(Boolean) as Timeline[]);
 
   // Create rules array if it's a string
-  const rulesArray =
-    typeof hackathon.rules === "string"
-      ? hackathon.rules.split("\n").filter((rule) => rule.trim() !== "")
-      : hackathon.rules || [];
+  const rulesArray = hackathon.rules || [];
 
   return (
     <div className="w-full bg-black min-h-screen">

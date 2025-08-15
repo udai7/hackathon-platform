@@ -18,6 +18,9 @@ export interface Hackathon {
   participants?: Participant[];
   upiId?: string;
   paymentRequired?: boolean;
+  rules?: string[];
+  prizeDetails?: Array<{ place: string; amount: string; description: string }>;
+  timeline?: Array<{ date: string; event: string }>;
 }
 
 export interface User {

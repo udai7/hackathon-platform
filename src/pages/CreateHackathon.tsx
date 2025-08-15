@@ -259,11 +259,44 @@ const CreateHackathon = () => {
 
         await updateHackathon(updatedHackathon);
       } else {
+        // Default prizeDetails and timeline
+        const defaultPrizeDetails = formData.prizes
+          ? [
+              {
+                place: "Prize Pool",
+                amount: formData.prizes,
+                description: "Total prize pool",
+              },
+            ]
+          : [];
+
+        const defaultTimeline = [];
+        if (formData.registrationDeadline) {
+          defaultTimeline.push({
+            date: formData.registrationDeadline,
+            event: "Registration Deadline",
+          });
+        }
+        if (formData.startDate) {
+          defaultTimeline.push({
+            date: formData.startDate,
+            event: "Hackathon Starts",
+          });
+        }
+        if (formData.endDate) {
+          defaultTimeline.push({
+            date: formData.endDate,
+            event: "Submission Deadline",
+          });
+        }
+
         const newHackathon: Hackathon = {
           ...formData,
           id: uuidv4(),
           creatorId: user?.id || "",
           featured: false,
+          prizeDetails: defaultPrizeDetails,
+          timeline: defaultTimeline,
         };
 
         await addHackathon(newHackathon);
