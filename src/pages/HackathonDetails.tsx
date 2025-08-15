@@ -412,7 +412,7 @@ const HackathonDetails = () => {
         status:
           parseInt(hackathon.registrationFee || "0") === 0 ||
           (hackathon.registrationFee || "").toLowerCase().includes("free")
-            ? "enrolled"
+            ? "approved"
             : "pending",
       };
 
@@ -1593,9 +1593,9 @@ const HackathonDetails = () => {
 
       {/* Registration Form Modal */}
       {showRegistrationForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-90vh overflow-y-auto">
-            <div className="bg-indigo-600 rounded-t-lg py-4 px-6 flex justify-between items-center">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+          <div className="glass-dark rounded-lg border border-white/20 shadow-xl w-full max-w-2xl max-h-90vh overflow-y-auto">
+            <div className="bg-blue-600 rounded-t-lg py-4 px-6 flex justify-between items-center">
               <h2 className="text-xl font-bold text-white">
                 Register for {hackathon?.title}
               </h2>
@@ -1607,9 +1607,9 @@ const HackathonDetails = () => {
               </button>
             </div>
 
-            <form onSubmit={handleRegistrationSubmit} className="p-6">
+            <form onSubmit={handleRegistrationSubmit} className="p-8">
               {formErrors.submit && (
-                <div className="p-4 mb-6 bg-red-50 text-red-700 rounded-md border border-red-200">
+                <div className="p-4 mb-6 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg">
                   <p className="font-medium">{formErrors.submit}</p>
                 </div>
               )}
@@ -1619,7 +1619,7 @@ const HackathonDetails = () => {
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-white mb-2"
                   >
                     Full Name*
                   </label>
@@ -1629,13 +1629,13 @@ const HackathonDetails = () => {
                     name="name"
                     value={registrationData.name}
                     onChange={handleRegistrationChange}
-                    className={`w-full px-3 py-2 border rounded-md ${
-                      formErrors.name ? "border-red-500" : "border-gray-300"
-                    } focus:ring-indigo-500 focus:border-indigo-500`}
+                    className={`input-modern ${
+                      formErrors.name ? "border-red-500" : ""
+                    }`}
                     placeholder="Enter your name"
                   />
                   {formErrors.name && (
-                    <p className="mt-1 text-sm text-red-500">
+                    <p className="mt-1 text-sm text-red-400">
                       {formErrors.name}
                     </p>
                   )}
@@ -1645,7 +1645,7 @@ const HackathonDetails = () => {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-white mb-2"
                   >
                     Email Address*
                   </label>
@@ -1655,13 +1655,13 @@ const HackathonDetails = () => {
                     name="email"
                     value={registrationData.email}
                     onChange={handleRegistrationChange}
-                    className={`w-full px-3 py-2 border rounded-md ${
-                      formErrors.email ? "border-red-500" : "border-gray-300"
-                    } focus:ring-indigo-500 focus:border-indigo-500`}
+                    className={`input-modern ${
+                      formErrors.email ? "border-red-500" : ""
+                    }`}
                     placeholder="you@example.com"
                   />
                   {formErrors.email && (
-                    <p className="mt-1 text-sm text-red-500">
+                    <p className="mt-1 text-sm text-red-400">
                       {formErrors.email}
                     </p>
                   )}
@@ -1671,7 +1671,7 @@ const HackathonDetails = () => {
                 <div>
                   <label
                     htmlFor="phone"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-white mb-2"
                   >
                     Phone Number*
                   </label>
@@ -1681,13 +1681,13 @@ const HackathonDetails = () => {
                     name="phone"
                     value={registrationData.phone}
                     onChange={handleRegistrationChange}
-                    className={`w-full px-3 py-2 border rounded-md ${
-                      formErrors.phone ? "border-red-500" : "border-gray-300"
-                    } focus:ring-indigo-500 focus:border-indigo-500`}
+                    className={`input-modern ${
+                      formErrors.phone ? "border-red-500" : ""
+                    }`}
                     placeholder="Your phone number"
                   />
                   {formErrors.phone && (
-                    <p className="mt-1 text-sm text-red-500">
+                    <p className="mt-1 text-sm text-red-400">
                       {formErrors.phone}
                     </p>
                   )}
@@ -1697,7 +1697,7 @@ const HackathonDetails = () => {
                 <div>
                   <label
                     htmlFor="college"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-white mb-2"
                   >
                     College/University
                   </label>
@@ -1707,7 +1707,7 @@ const HackathonDetails = () => {
                     name="college"
                     value={registrationData.college}
                     onChange={handleRegistrationChange}
-                    className="w-full px-3 py-2 border rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="input-modern"
                     placeholder="Your educational institution"
                   />
                 </div>
@@ -1716,7 +1716,7 @@ const HackathonDetails = () => {
                 <div className="col-span-1 md:col-span-2">
                   <label
                     htmlFor="skills"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-white mb-2"
                   >
                     Skills*
                   </label>
@@ -1726,13 +1726,13 @@ const HackathonDetails = () => {
                     name="skills"
                     value={registrationData.skills}
                     onChange={handleRegistrationChange}
-                    className={`w-full px-3 py-2 border rounded-md ${
-                      formErrors.skills ? "border-red-500" : "border-gray-300"
-                    } focus:ring-indigo-500 focus:border-indigo-500`}
+                    className={`input-modern ${
+                      formErrors.skills ? "border-red-500" : ""
+                    }`}
                     placeholder="List relevant skills (e.g., React, Python, UI/UX)"
                   />
                   {formErrors.skills && (
-                    <p className="mt-1 text-sm text-red-500">
+                    <p className="mt-1 text-sm text-red-400">
                       {formErrors.skills}
                     </p>
                   )}
@@ -1742,7 +1742,7 @@ const HackathonDetails = () => {
                 <div className="col-span-1 md:col-span-2">
                   <label
                     htmlFor="experience"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-white mb-2"
                   >
                     Experience
                   </label>
@@ -1752,7 +1752,7 @@ const HackathonDetails = () => {
                     rows={3}
                     value={registrationData.experience}
                     onChange={handleRegistrationChange}
-                    className="w-full px-3 py-2 border rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="input-modern resize-none"
                     placeholder="Briefly describe your relevant experience"
                   />
                 </div>
@@ -1761,7 +1761,7 @@ const HackathonDetails = () => {
                 <div>
                   <label
                     htmlFor="teamName"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-white mb-2"
                   >
                     Team Name
                   </label>
@@ -1771,7 +1771,7 @@ const HackathonDetails = () => {
                     name="teamName"
                     value={registrationData.teamName}
                     onChange={handleRegistrationChange}
-                    className="w-full px-3 py-2 border rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="input-modern"
                     placeholder="Your team name (if applicable)"
                   />
                 </div>
@@ -1780,7 +1780,7 @@ const HackathonDetails = () => {
                 <div>
                   <label
                     htmlFor="teammates"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-white mb-2"
                   >
                     Team Members
                   </label>
@@ -1790,24 +1790,24 @@ const HackathonDetails = () => {
                     name="teammates"
                     value={registrationData.teammates}
                     onChange={handleRegistrationChange}
-                    className="w-full px-3 py-2 border rounded-md border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="input-modern"
                     placeholder="List teammates (if any), separated by commas"
                   />
                 </div>
               </div>
 
-              <div className="mt-8 flex justify-end">
+              <div className="mt-8 flex justify-end space-x-4">
                 <button
                   type="button"
                   onClick={() => setShowRegistrationForm(false)}
-                  className="mr-4 px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  className="px-4 py-2 border border-white/20 rounded-md text-gray-300 bg-white/10 hover:bg-white/20 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                  className={`px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
                     isSubmitting ? "opacity-75 cursor-not-allowed" : ""
                   }`}
                 >
@@ -1821,11 +1821,11 @@ const HackathonDetails = () => {
 
       {/* Registration Success Modal */}
       {registrationSuccess && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 text-center">
-            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mx-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+          <div className="glass-dark rounded-lg border border-green-500/30 shadow-xl w-full max-w-md p-8 text-center">
+            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20 border border-green-500/30 mx-auto">
               <svg
-                className="h-8 w-8 text-green-600"
+                className="h-8 w-8 text-green-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -1839,16 +1839,20 @@ const HackathonDetails = () => {
                 ></path>
               </svg>
             </div>
-            <h2 className="text-2xl font-bold mb-2 text-gray-900">
+            <h2 className="text-2xl font-bold mb-2 text-green-300">
               Registration Successful!
             </h2>
-            <p className="text-gray-600 mb-6">
-              Your registration for {hackathon?.title} has been successfully
-              submitted. The organizer will review your application.
+            <p className="text-gray-300 mb-6">
+              Your registration for{" "}
+              <span className="text-blue-400 font-semibold">
+                {hackathon?.title}
+              </span>{" "}
+              has been successfully submitted. The organizer will review your
+              application.
             </p>
             <button
               onClick={() => setRegistrationSuccess(false)}
-              className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               Close
             </button>
