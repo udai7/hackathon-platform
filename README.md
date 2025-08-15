@@ -34,6 +34,45 @@ _Experience the sleek dark theme with neon accents, 3D card effects, and beautif
 - **Particle Background**: Dynamic animated particle system
 - **Responsive Design**: Optimized for all screen sizes
 
+## 🔁 Recent Changes (Aug 2025)
+
+These are the most notable UI and backend improvements made recently while developing this project. They reflect work to normalize submissions, improve winner handling, and clean up frontend flows.
+
+- Normalized Submissions collection
+
+  - Introduced a dedicated `Submission` model and collection to store project submissions separately from `Hackathon.participants`.
+  - Submissions include fields like `hackathonId`, `participantId`, `userId`, `teamName`, `projectTitle`, `githubLink`, `liveUrl`, `projectDescription`, `evaluation`, `ranking`, and `winner` metadata.
+
+- New backend APIs
+
+  - `POST /api/hackathons/:hackathonId/submissions` — create a normalized submission.
+  - `GET  /api/hackathons/:hackathonId/submissions` — list submissions for a hackathon.
+  - `POST /api/hackathons/:hackathonId/submissions/:submissionId/declare-winner` — declare a winner scoped to a submission.
+  - Legacy participant-scoped endpoints are preserved for compatibility (e.g. `POST /api/hackathons/:hackathonId/declare-winner` and participant-scoped variants).
+
+- Frontend changes
+
+  - `HackathonDetails` now fetches and renders normalized submissions when available and uses the new create/list/declare submission APIs.
+  - Submission modal updated to include an optional `Project Title` field and uses the normalized `createSubmission` flow.
+  - `hackathonService` has helper functions for `createSubmission`, `listSubmissions`, and `declareWinnerBySubmission` which prefer submission-scoped routes and fall back to legacy participant-scoped routes if needed.
+  - `Dashboard` now prefers showing winner badges and "View Project" links driven by normalized submissions (falls back to legacy `participant.projectSubmission` when normalized submissions are not present).
+
+- Declare winner behavior
+
+  - Winner declaration is now scoped to a specific submission document, preventing cross-hackathon conflicts when the same user participates in multiple hackathons.
+  - The UI pre-fills the declare-winner modal with existing winner data when available and supports overwrite via an `overwrite` flag.
+
+- Migration & tooling
+
+  - A non-destructive migration script was added at `scripts/migrate-submissions.ts` to copy existing `participant.projectSubmission` entries into the normalized `Submission` collection. The script is idempotent for hackathon+participant pairs and is optional — run it only if you want historical submissions visible in the new UI.
+  - Package script added: `npm run migrate:submissions` (runs the migration script via `tsx`).
+
+- Notes about rollout
+  - The code keeps legacy fallbacks so the app remains functional before/after migration.
+  - New normalized APIs are preferred for new submissions; historical data will remain visible only if migrated or if legacy participant-based submission fields are still present.
+
+If you'd like, I can: add a `--dry-run` mode to the migration script, run the migration for you against a specified DB, or remove legacy fallbacks once you've confirmed migration.
+
 ### 🔐 **Robust Authentication System**
 
 - **Google OAuth Integration**: Sign in/up with Google accounts
@@ -64,123 +103,99 @@ _Experience the sleek dark theme with neon accents, 3D card effects, and beautif
 - **Loading States**: Beautiful loading indicators and skeleton screens
 - **Error Handling**: Comprehensive error messages and recovery options
 
+# � Hackathon Platform
+
+An end-to-end platform for hosting, managing, and participating in hackathons. Features include registration, project submission, winner declaration, payment integration, and a modern, interactive UI.
+
+---
+
+## 🌟 Features
+
+### Hackathon Management
+
+- Create, edit, and delete hackathons with custom details, dates, and rules
+- View all upcoming and past hackathons
+- Admin dashboard for managing hackathons and participants
+
+### Registration & Participation
+
+- Register for hackathons with a modern, themed form (styled with Tailwind & shadcn/ui)
+- Google OAuth login for quick, secure authentication
+- Session management with JWT and refresh logic
+
+### Project Submission
+
+- Submit projects scoped to specific hackathons
+- Each submission includes project details, links, and description
+- Submissions are normalized: winners are tracked per hackathon, allowing repeat wins in different events
+
+### Winner Declaration
+
+- Admins can declare winners for each hackathon
+- Winner modal allows selection of 1st, 2nd, and 3rd place, with custom descriptions
+- Winner badges and project links shown in dashboard and hackathon details
+
+### Payment Integration
+
+- Razorpay integration for paid hackathon registration
+- Secure payment flow with backend verification
+
+### AI Project Evaluation
+
+- Google Gemini AI integration for automated project scoring (optional)
+
+### Migration Tooling
+
+- TypeScript script for migrating legacy submissions to the normalized model
+
+### UI/UX Highlights
+
+- 3D cards, glassmorphism, neon effects, animated particle backgrounds
+- Responsive design for desktop and mobile
+- Real-time session status indicator
+- Beautiful loading states and error handling
+
+### Security & Auth
+
+- JWT-based authentication and session expiry
+- Google OAuth for user onboarding
+- Secure token storage and validation
+
+### Developer Experience
+
+- TypeScript throughout (frontend & backend)
+- ESLint for code quality
+- Vite for fast builds
+- Concurrently for running frontend/backend together
+
+---
+
 ## 🛠️ Tech Stack
 
-### Frontend
+**Frontend:**
 
-- **React 18.2** with TypeScript
-- **Tailwind CSS** for styling
-- **shadcn/ui** components
-- **React Router** for navigation
-- **Vite** for build tooling
-- **Google OAuth** for authentication
+- React 18 + TypeScript
+- Tailwind CSS
+- shadcn/ui
+- React Router
+- Vite
 
-### Backend
+**Backend:**
 
-- **Node.js** with Express
-- **MongoDB** with Mongoose
-- **JWT** for authentication
-- **Razorpay** for payments
-- **Google Gemini AI** for project evaluation
+- Node.js + Express
+- MongoDB + Mongoose
+- JWT
+- Razorpay
+- Google Gemini AI
 
-### Development Tools
+**Tooling:**
 
-- **TypeScript** for type safety
-- **ESLint** for code quality
-- **Concurrently** for running multiple processes
-- **tsx** for TypeScript execution
+- TypeScript
+- ESLint
+- tsx
+- Concurrently
 
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Node.js** (v18 or higher)
-- **MongoDB** (local installation or MongoDB Atlas)
-- **Google OAuth Credentials** (optional, for Google login)
-
-### Installation
-
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/udai7/hackathon-platform.git
-   cd hackathon-platform
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Environment Setup**
-
-   Create a `.env` file in the root directory:
-
-   ```env
-   # Server Configuration
-   PORT=5000
-
-   # Database
-   MONGODB_URI=mongodb+srv://username:password@cluster0.mongodb.net/hackathon-platform?retryWrites=true&w=majority
-
-   # Authentication
-   JWT_SECRET=hackpub-super-secret-jwt-key-2024
-   SESSION_SECRET=hackpub-session-secret-2024
-
-   # Google OAuth (Optional)
-   GOOGLE_CLIENT_ID=your-google-client-id
-   GOOGLE_CLIENT_SECRET=your-google-client-secret
-   VITE_GOOGLE_CLIENT_ID=your-google-client-id
-
-   # Payment Integration (Optional)
-   RAZORPAY_KEY_ID=your-razorpay-key-id
-   RAZORPAY_KEY_SECRET=your-razorpay-key-secret
-   ```
-
-4. **Start the application**
-
-   **Option 1: Run both frontend and backend together**
-
-   ```bash
-   npm run dev:full
-   ```
-
-   **Option 2: Run separately**
-
-   ```bash
-   # Terminal 1 - Backend
-   npm run server
-
-   # Terminal 2 - Frontend
-   npm run dev
-   ```
-
-5. **Access the application**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:5000
-
-## 🔧 Configuration
-
-### Google OAuth Setup
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing
-3. Enable Google+ API
-4. Create OAuth 2.0 credentials
-5. Add authorized origins: `http://localhost:5173`
-6. Update `.env` with your credentials
-
-### MongoDB Setup
-
-- **Local MongoDB**: Use `mongodb://localhost:27017/hackathon-platform`
-- **MongoDB Atlas**: Get connection string from your cluster
-
-### Payment Setup (Optional)
-
-1. Create a [Razorpay](https://razorpay.com/) account
-2. Get API keys from dashboard
-3. Update `.env` with your keys
+---
 
 ## 📁 Project Structure
 
@@ -190,152 +205,153 @@ hackathon-platform/
 ├── src/
 │   ├── components/         # Reusable UI components
 │   │   ├── ui/            # shadcn/ui components
-│   │   ├── Navbar.tsx     # Navigation component
-│   │   ├── Footer.tsx     # Footer component
+│   │   ├── Navbar.tsx     # Navigation
+│   │   ├── Footer.tsx     # Footer
 │   │   └── ...
-│   ├── pages/             # Page components
-│   │   ├── Home.tsx       # Landing page
-│   │   ├── Login.tsx      # Authentication
-│   │   ├── Dashboard.tsx  # User dashboard
-│   │   └── ...
-│   ├── context/           # React contexts
-│   │   ├── AuthContext.tsx    # Authentication state
-│   │   └── HackathonContext.tsx # Hackathon data
+│   ├── pages/             # Page components (Home, Login, Dashboard, etc.)
+│   ├── context/           # React contexts (Auth, Hackathon)
 │   ├── services/          # API services
+│   ├── db/                # Database models (Hackathon, User, Submission, Payment)
 │   ├── types/             # TypeScript types
 │   └── lib/               # Utility functions
 ├── server.ts              # Backend server
-├── src/db/                # Database models and connection
+├── scripts/               # Migration scripts
 └── ...
 ```
 
-## 🎨 UI Components
+---
 
-### Custom Components
+## 🚀 Getting Started
 
-- **3D Cards**: Interactive cards with depth and hover effects
-- **Glass Components**: Glassmorphism design elements
-- **Neon Effects**: Glowing text and borders
-- **Particle Background**: Animated particle system
-- **Session Status**: Real-time session monitoring
+### Prerequisites
 
-### shadcn/ui Integration
+- Node.js v18+
+- MongoDB (local or Atlas)
+- Google OAuth credentials (for login)
+- Razorpay API keys (for payments)
 
-- **Button**: Multiple variants (cyber, glass, default)
-- **Input**: Modern input fields with focus states
-- **Card**: Flexible card components
-- **Loading**: Beautiful loading states
+### Installation
 
-## 🔐 Authentication Flow
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/udai7/hackathon-platform.git
+   cd hackathon-platform
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env` file in the root directory (see below for required variables)
+4. Start the app:
+   - Run both frontend & backend: `npm run dev:full`
+   - Or run separately:
+     - Backend: `npm run server`
+     - Frontend: `npm run dev`
+5. Access at:
+   - Frontend: http://localhost:5173
+   - Backend: http://localhost:5000
 
-### Session Management
+### Environment Variables
 
-- **24-hour sessions** with automatic refresh
-- **1-hour refresh threshold** for active users
-- **Secure token storage** with expiry validation
-- **Session status indicator** for user awareness
-
-### Google OAuth Flow
-
-1. User clicks "Sign in with Google"
-2. Google OAuth popup appears
-3. User authorizes the application
-4. JWT credential is received and validated
-5. User profile is created/updated
-6. Session is established with token
-
-## 🚀 Deployment
-
-### Build for Production
-
-```bash
-npm run build
+```env
+# Server
+PORT=5000
+# Database
+MONGODB_URI=your-mongodb-uri
+# Auth
+JWT_SECRET=your-jwt-secret
+SESSION_SECRET=your-session-secret
+# Google OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+VITE_GOOGLE_CLIENT_ID=your-google-client-id
+# Razorpay
+RAZORPAY_KEY_ID=your-razorpay-key-id
+RAZORPAY_KEY_SECRET=your-razorpay-key-secret
 ```
-
-### Environment Variables for Production
-
-Ensure all environment variables are set in your production environment, especially:
-
-- `MONGODB_URI` (production database)
-- `JWT_SECRET` (strong secret key)
-- `GOOGLE_CLIENT_ID` (production OAuth credentials)
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**1. Network Errors**
-
-- Ensure backend server is running on port 5000
-- Check MongoDB connection string
-- Verify CORS configuration
-
-**2. Google OAuth Issues**
-
-- Verify Google Client ID in environment variables
-- Check authorized origins in Google Console
-- Ensure HTTPS in production
-
-**3. Session Problems**
-
-- Clear browser localStorage if sessions are stuck
-- Check JWT token expiry
-- Verify session secret configuration
-
-**4. Build Errors**
-
-- Run `npm install` to ensure all dependencies
-- Check TypeScript configuration
-- Verify environment variables
-
-### Debug Mode
-
-```bash
-# Backend with detailed logs
-npm run backend:debug
-
-# Check build issues
-npm run build
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **shadcn/ui** for beautiful UI components
-- **Tailwind CSS** for utility-first styling
-- **React OAuth Google** for authentication
-- **Lucide React** for icons
-- **Framer Motion** for animations
-
-## 📞 Contact & Support
-
-<div align="center">
-
-**Udai Das**
-
-[![Email](https://img.shields.io/badge/Email-udaid347%40gmail.com-red.svg)](mailto:udaid347@gmail.com)
-[![GitHub](https://img.shields.io/badge/GitHub-udai7-black.svg)](https://github.com/udai7)
-[![Portfolio](https://img.shields.io/badge/Portfolio-Visit-blue.svg)](https://udaidas.tech/)
-
-</div>
 
 ---
 
-<div align="center">
+## 🔐 Authentication & Session Flow
+
+- Google OAuth login (popup, JWT credential, session creation)
+- 24-hour session expiry, 1-hour refresh threshold
+- Secure token storage and expiry validation
+- Session status indicator in UI
+
+---
+
+## 🏆 Winner Declaration & Submissions
+
+- Submissions are stored per hackathon (normalized model)
+- Admins can declare 1st, 2nd, 3rd place winners with descriptions
+- Winner badges and project links shown in dashboard and details
+- Migration script available for legacy data
+
+---
+
+## � Payment Integration
+
+- Razorpay for paid hackathon registration
+- Secure backend verification
+
+---
+
+## 🤖 AI Project Evaluation
+
+- Google Gemini AI integration for automated scoring (optional)
+
+---
+
+## 🎨 UI/UX Highlights
+
+- 3D cards, glassmorphism, neon effects
+- Particle backgrounds, animated transitions
+- Responsive and modern design
+
+---
+
+## 🐛 Troubleshooting
+
+- Backend not running? Check MongoDB URI and port
+- Google OAuth issues? Verify client ID and authorized origins
+- Session problems? Clear localStorage, check JWT expiry
+- Build errors? Run `npm install`, check TypeScript config
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repo
+2. Create a feature branch
+3. Commit and push your changes
+4. Open a Pull Request
+
+---
+
+## 📄 License
+
+MIT License. See [LICENSE](LICENSE).
+
+---
+
+## 🙏 Acknowledgments
+
+- shadcn/ui
+- Tailwind CSS
+- React OAuth Google
+- Lucide React
+- Framer Motion
+
+---
+
+## 📞 Contact & Support
+
+**Udai Das**  
+[Email](mailto:udaid347@gmail.com) | [GitHub](https://github.com/udai7) | [Portfolio](https://udaidas.tech/)
+
+---
 
 **⭐ Star this repository if you found it helpful!**
 
 Made with ❤️ by [Udai Das](https://github.com/udai7)
-
-</div>
