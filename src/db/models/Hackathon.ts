@@ -56,7 +56,22 @@ const ParticipantSchema = new mongoose.Schema({
       feedback: { type: String },
       rankedAt: { type: Date },
     },
+    winner: {
+      position: { type: String },
+      description: { type: String },
+      declaredBy: { type: String },
+      declaredAt: { type: Date },
+    },
   },
+  notifications: [
+    {
+      id: { type: String },
+      message: { type: String },
+      tag: { type: String },
+      read: { type: Boolean, default: false },
+      createdAt: { type: Date, default: Date.now },
+    },
+  ],
 });
 
 // Create a hackathon schema

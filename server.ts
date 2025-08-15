@@ -498,11 +498,9 @@ const registerParticipant = (req: Request, res: Response): void => {
           res.status(404).json({ message: "Hackathon not found" });
           return;
         } else if (error.message === "User already registered") {
-          res
-            .status(400)
-            .json({
-              message: "You have already registered for this hackathon",
-            });
+          res.status(400).json({
+            message: "You have already registered for this hackathon",
+          });
           return;
         }
       }
@@ -1010,6 +1008,97 @@ const rankHackathonProjects = async (
   }
 };
 
+// Declare a winner for a participant's submission
+const declareWinner = async (req: Request, res: Response): Promise<void> => {
+  const { hackathonId } = req.params;
+  // support participantId either in params (more RESTful) or in the body
+  const participantIdFromParams = (req.params as any).participantId;
+  const {
+    participantId: participantIdFromBody,
+    position,
+    description,
+    declaredBy,
+  } = req.body || {};
+  const participantId = participantIdFromParams || participantIdFromBody;
+
+  console.log(
+    `declareWinner called - hackathonId=${hackathonId} participantId=${participantId} body=`,
+    req.body
+  );
+
+  if (!participantId) {
+    res
+      .status(400)
+      .json({ error: "participantId is required (in URL or body)" });
+    return;
+  }
+
+  try {
+    const hackathon = await HackathonModel.findOne({ id: hackathonId });
+    if (!hackathon) {
+      console.warn(`declareWinner: hackathon not found: ${hackathonId}`);
+      res.status(404).json({ error: "Hackathon not found" });
+      return;
+    }
+
+    const participant = (hackathon.participants || []).find((p: any) => {
+      // match against several possible stored id fields
+      return (
+        p.id === participantId ||
+        p.userId === participantId ||
+        (p._id && p._id.toString && p._id.toString() === participantId)
+      );
+    });
+
+    if (!participant || !participant.projectSubmission) {
+      console.warn(
+        `declareWinner: participant or submission not found for participantId=${participantId} in hackathon=${hackathonId}`
+      );
+      res.status(404).json({ error: "Participant or submission not found" });
+      return;
+    }
+
+    // Prevent redeclaring a winner for the same participant
+    if (participant.projectSubmission.winner) {
+      console.warn(
+        `declareWinner: winner already declared for participantId=${participantId} in hackathon=${hackathonId}`
+      );
+      res
+        .status(400)
+        .json({ error: "Winner already declared for this participant" });
+      return;
+    }
+
+    participant.projectSubmission.winner = {
+      position,
+      description,
+      declaredBy,
+      declaredAt: new Date(),
+    } as any;
+
+    // Add notification for the participant
+    const note = {
+      id: `note-${Date.now()}`,
+      message: `Congratulations! Your project has been declared ${position}. ${
+        description || ""
+      }`,
+      tag: position,
+      read: false,
+      createdAt: new Date(),
+    };
+
+    if (!participant.notifications) participant.notifications = [];
+    participant.notifications.push(note as any);
+
+    await hackathon.save();
+
+    res.status(200).json({ message: "Winner declared", participant, note });
+  } catch (error) {
+    console.error("Error declaring winner:", error);
+    res.status(500).json({ error: "Failed to declare winner" });
+  }
+};
+
 // Get participant analytics
 const getParticipantAnalytics = async (
   req: Request,
@@ -1089,6 +1178,12 @@ router.post("/payments/verify", verifyPayment);
 router.post("/hackathons/:hackathonId/submit-project", submitProject);
 router.post("/hackathons/:hackathonId/evaluate-project", evaluateProject);
 router.post("/hackathons/:hackathonId/rank-projects", rankHackathonProjects);
+// Support both the body-based and participant-scoped declare-winner routes
+router.post("/hackathons/:hackathonId/declare-winner", declareWinner);
+router.post(
+  "/hackathons/:hackathonId/participants/:participantId/declare-winner",
+  declareWinner
+);
 router.get("/hackathons/:hackathonId/analytics", getParticipantAnalytics);
 
 // Mount the router to the /api path

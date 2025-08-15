@@ -355,10 +355,20 @@ const Dashboard = () => {
                                 {hackathon.title}
                               </h4>
                               <p className="text-gray-400 text-sm">
-                                Status:{" "}
-                                <span className="capitalize">
-                                  {participant.status}
-                                </span>
+                                Status: {" "}
+                                <span className="capitalize">{participant.status}</span>
+                                {participant.projectSubmission?.winner && (
+                                  <>
+                                    <span className="ml-3 inline-flex items-center px-2 py-1 bg-green-600 text-black text-xs font-semibold rounded">
+                                      {participant.projectSubmission.winner.position} Winner
+                                    </span>
+                                    {participant.projectSubmission.winner.description && (
+                                      <div className="mt-1 text-xs text-gray-300">
+                                        {participant.projectSubmission.winner.description}
+                                      </div>
+                                    )}
+                                  </>
+                                )}
                               </p>
                             </div>
                             <Button asChild variant="glass" size="sm">
@@ -548,7 +558,11 @@ const Dashboard = () => {
                               </div>
 
                               {/* Submission indicator */}
-                              {participant.projectSubmission ? (
+                              {participant.projectSubmission &&
+                              (participant.projectSubmission.githubLink ||
+                                participant.projectSubmission
+                                  .projectDescription ||
+                                participant.projectSubmission.liveUrl) ? (
                                 <div className="text-sm text-gray-300">
                                   <span className="font-medium">Submitted</span>
                                   <span className="ml-2 text-xs text-gray-400">

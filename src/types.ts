@@ -93,5 +93,18 @@ export interface Participant {
       feedback: string;
       rankedAt: Date;
     };
+    winner?: {
+      position: "1st" | "2nd" | "3rd";
+      description?: string;
+      declaredBy?: string;
+      declaredAt?: Date;
+    };
   };
+  notifications?: {
+    id?: string;
+    message: string;
+    tag?: string;
+    read?: boolean;
+    createdAt?: Date;
+  }[];
 }

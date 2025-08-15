@@ -240,6 +240,14 @@ const HackathonDetails = () => {
   const [editingRules, setEditingRules] = useState(false);
   const [editingTimeline, setEditingTimeline] = useState(false);
   const [editingPrizes, setEditingPrizes] = useState(false);
+  const [showDeclareModalFor, setShowDeclareModalFor] = useState<string | null>(
+    null
+  );
+  const [winnerPosition, setWinnerPosition] = useState<"1st" | "2nd" | "3rd">(
+    "1st"
+  );
+  const [winnerDescription, setWinnerDescription] = useState("");
+  const [isDeclaring, setIsDeclaring] = useState(false);
   const [newRule, setNewRule] = useState("");
   const [newTimelineEvent, setNewTimelineEvent] = useState({
     date: "",
@@ -905,15 +913,7 @@ const HackathonDetails = () => {
                         >
                           View Registration
                         </Link>
-                      ) : user?.role === "host" ? (
-                        <button
-                          disabled
-                          className="bg-gray-600 cursor-not-allowed text-gray-400 px-6 py-3 rounded-md font-semibold border border-gray-600"
-                          title="Hosts cannot register for hackathons"
-                        >
-                          Hosts Cannot Register
-                        </button>
-                      ) : (
+                      ) : user?.role === "host" ? null : (
                         <button
                           onClick={handleRegisterClick}
                           className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-semibold transition-colors duration-300 shadow-lg"
@@ -1394,10 +1394,26 @@ const HackathonDetails = () => {
 
                 {/* Derive submissions from participants' projectSubmission */}
                 {hackathon.participants &&
-                hackathon.participants.some((p) => p.projectSubmission) ? (
+                hackathon.participants.some(
+                  (p) =>
+                    p.projectSubmission &&
+                    (p.projectSubmission.githubLink ||
+                      p.projectSubmission.projectDescription ||
+                      p.projectSubmission.liveUrl) &&
+                    (isCreator ? true : p.userId === user?.id)
+                ) ? (
                   <div className="space-y-6">
                     {hackathon.participants
-                      .filter((p) => p.projectSubmission)
+                      .filter((p) => {
+                        const hasSubmission =
+                          p.projectSubmission &&
+                          (p.projectSubmission.githubLink ||
+                            p.projectSubmission.projectDescription ||
+                            p.projectSubmission.liveUrl);
+                        if (!hasSubmission) return false;
+                        if (isCreator) return true;
+                        return p.userId === user?.id;
+                      })
                       .map((p) => {
                         const submission = p.projectSubmission as any;
                         return (
@@ -1463,10 +1479,123 @@ const HackathonDetails = () => {
                                   <FaLink className="mr-2" /> Live Demo
                                 </a>
                               )}
+                              {/* Declare winner button for creator */}
+                              {submission.winner ? (
+                                <div className="ml-auto px-3 py-1 bg-green-600 text-black rounded-md text-sm font-semibold">
+                                  {submission.winner.position} Winner
+                                </div>
+                              ) : (
+                                isCreator && (
+                                  <button
+                                    onClick={() => {
+                                      setShowDeclareModalFor(p.id);
+                                      setWinnerPosition("1st");
+                                      setWinnerDescription("");
+                                    }}
+                                    className="ml-auto px-3 py-2 bg-yellow-600 text-black rounded-md hover:bg-yellow-500"
+                                  >
+                                    Declare Winner
+                                  </button>
+                                )
+                              )}
                             </div>
                           </div>
                         );
                       })}
+                    {/* Declare Winner Modal */}
+                    {showDeclareModalFor && (
+                      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+                        <div className="glass-dark rounded-lg border border-white/20 p-6 max-w-md w-full">
+                          <h3 className="text-lg font-semibold text-white mb-4">
+                            Declare Winner
+                          </h3>
+                          <label className="block text-sm text-white mb-2">
+                            Position
+                          </label>
+                          <select
+                            value={winnerPosition}
+                            onChange={(e) =>
+                              setWinnerPosition(e.target.value as any)
+                            }
+                            className="w-full mb-4 p-2 rounded bg-white/10 text-white"
+                          >
+                            <option value="1st">1st</option>
+                            <option value="2nd">2nd</option>
+                            <option value="3rd">3rd</option>
+                          </select>
+                          <label className="block text-sm text-white mb-2">
+                            Message (optional)
+                          </label>
+                          <textarea
+                            value={winnerDescription}
+                            onChange={(e) =>
+                              setWinnerDescription(e.target.value)
+                            }
+                            className="w-full mb-4 p-2 rounded bg-white/10 text-white"
+                            rows={4}
+                          />
+                          <div className="flex justify-end gap-3">
+                            <button
+                              onClick={() => setShowDeclareModalFor(null)}
+                              className="px-4 py-2 border border-white/20 rounded text-gray-300"
+                              disabled={isDeclaring}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (!hackathon || !showDeclareModalFor) return;
+                                setIsDeclaring(true);
+                                try {
+                                  await hackathonService.declareWinner(
+                                    hackathon.id,
+                                    showDeclareModalFor,
+                                    winnerPosition,
+                                    winnerDescription,
+                                    user?.name
+                                  );
+                                  // Refresh hackathon
+                                  const updated =
+                                    await hackathonService.getHackathonById(
+                                      hackathon.id
+                                    );
+                                  if (updated) setHackathon(updated);
+                                  if (updated) {
+                                    // update local state
+                                    setHackathon(updated);
+                                    // notify other parts of the app (Dashboard, lists) to refresh their cached hackathons
+                                    try {
+                                      window.dispatchEvent(
+                                        new CustomEvent("hackathon-updated", {
+                                          detail: updated,
+                                        })
+                                      );
+                                    } catch (e) {
+                                      // ignore in non-browser env
+                                    }
+                                  }
+                                  setShowDeclareModalFor(null);
+                                  // immediate feedback to the creator
+                                  alert("Winner declared successfully");
+                                } catch (err) {
+                                  console.error(
+                                    "Failed to declare winner",
+                                    err
+                                  );
+                                  alert("Failed to declare winner");
+                                } finally {
+                                  setIsDeclaring(false);
+                                }
+                              }}
+                              className="px-4 py-2 bg-green-600 text-white rounded"
+                              disabled={isDeclaring}
+                            >
+                              {isDeclaring ? "Declaring..." : "Declare"}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="text-center py-16 bg-white/10 rounded-lg border border-white/20">

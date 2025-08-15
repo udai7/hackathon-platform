@@ -215,3 +215,40 @@ export const submitProject = async (
     throw error;
   }
 };
+
+// Declare a winner for a submission
+export const declareWinner = async (
+  hackathonId: string,
+  participantId: string,
+  position: "1st" | "2nd" | "3rd",
+  description?: string,
+  declaredBy?: string
+): Promise<any> => {
+  try {
+    // Prefer a participant-scoped route so the server receives participantId as a URL param
+    // This avoids mismatches where participantId wasn't present in the path.
+    let response;
+    try {
+      response = await api.post(
+        `/hackathons/${hackathonId}/participants/${participantId}/declare-winner`,
+        {
+          position,
+          description,
+          declaredBy,
+        }
+      );
+    } catch (innerErr) {
+      // If participant-scoped route is not available, fall back to the original body-based route
+      response = await api.post(`/hackathons/${hackathonId}/declare-winner`, {
+        participantId,
+        position,
+        description,
+        declaredBy,
+      });
+    }
+    return response.data;
+  } catch (error) {
+    console.error("Error declaring winner:", error);
+    throw error;
+  }
+};

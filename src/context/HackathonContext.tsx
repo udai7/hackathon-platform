@@ -1,7 +1,13 @@
-import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { useAuth } from './AuthContext';
-import { Hackathon } from '../types';
-import * as hackathonService from '../services/hackathonService';
+import {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  ReactNode,
+} from "react";
+import { useAuth } from "./AuthContext";
+import { Hackathon } from "../types";
+import * as hackathonService from "../services/hackathonService";
 
 interface HackathonContextType {
   allHackathons: Hackathon[];
@@ -14,7 +20,9 @@ interface HackathonContextType {
   error: string | null;
 }
 
-const HackathonContext = createContext<HackathonContextType | undefined>(undefined);
+const HackathonContext = createContext<HackathonContextType | undefined>(
+  undefined
+);
 
 interface HackathonProviderProps {
   children: ReactNode;
@@ -35,21 +43,33 @@ export const HackathonProvider = ({ children }: HackathonProviderProps) => {
         setIsLoading(true);
         const hackathons = await hackathonService.getAllHackathons();
         setAllHackathons(hackathons);
-        
+
         // Load featured hackathons
         const featured = await hackathonService.getFeaturedHackathons();
         setFeaturedHackathons(featured);
-        
+
         setError(null);
       } catch (error) {
-        console.error('Error loading hackathons:', error);
-        setError('Failed to load hackathons');
+        console.error("Error loading hackathons:", error);
+        setError("Failed to load hackathons");
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchHackathons();
+    // Listen for external updates (e.g., declared winner) and merge into state
+    const handler = (e: any) => {
+      const updated: Hackathon = e?.detail;
+      if (updated && updated.id) {
+        setAllHackathons((prev) =>
+          prev.map((h) => (h.id === updated.id ? updated : h))
+        );
+      }
+    };
+    window.addEventListener("hackathon-updated", handler as any);
+    return () =>
+      window.removeEventListener("hackathon-updated", handler as any);
   }, []);
 
   // Filter hackathons by current user
@@ -57,10 +77,12 @@ export const HackathonProvider = ({ children }: HackathonProviderProps) => {
     const fetchUserHackathons = async () => {
       if (user) {
         try {
-          const userHackathons = await hackathonService.getHackathonsByCreator(user.id);
+          const userHackathons = await hackathonService.getHackathonsByCreator(
+            user.id
+          );
           setUserHackathons(userHackathons);
         } catch (error) {
-          console.error('Error fetching user hackathons:', error);
+          console.error("Error fetching user hackathons:", error);
         }
       } else {
         setUserHackathons([]);
@@ -74,39 +96,50 @@ export const HackathonProvider = ({ children }: HackathonProviderProps) => {
   const addHackathon = async (hackathon: Hackathon) => {
     try {
       // First try to create the hackathon through the API
-      const createdHackathon = await hackathonService.createHackathon(hackathon);
-      
+      const createdHackathon = await hackathonService.createHackathon(
+        hackathon
+      );
+
       // If successful, update the local state
-      setAllHackathons(prevHackathons => [...prevHackathons, createdHackathon]);
-      
+      setAllHackathons((prevHackathons) => [
+        ...prevHackathons,
+        createdHackathon,
+      ]);
+
       // Update featured hackathons if needed
       if (createdHackathon.featured) {
         const featured = await hackathonService.getFeaturedHackathons();
         setFeaturedHackathons(featured);
       }
-      
+
       // Clear any previous errors
       setError(null);
       return createdHackathon;
     } catch (error: any) {
-      console.error('Error adding hackathon:', error);
-      
+      console.error("Error adding hackathon:", error);
+
       // Set error message in context for displaying to user
-      let errorMessage = 'Failed to create hackathon';
-      
-      if (error.message && typeof error.message === 'string') {
-        if (error.message.includes('Network Error') || 
-            error.message.includes('connect') || 
-            error.message.includes('timeout') ||
-            error.message.includes('server')) {
+      let errorMessage = "Failed to create hackathon";
+
+      if (error.message && typeof error.message === "string") {
+        if (
+          error.message.includes("Network Error") ||
+          error.message.includes("connect") ||
+          error.message.includes("timeout") ||
+          error.message.includes("server")
+        ) {
           errorMessage = `Network error: ${error.message}`;
         } else {
           errorMessage = error.message;
         }
-      } else if (error.response && error.response.data && error.response.data.message) {
+      } else if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
         errorMessage = error.response.data.message;
       }
-      
+
       setError(errorMessage);
       throw error;
     }
@@ -115,38 +148,48 @@ export const HackathonProvider = ({ children }: HackathonProviderProps) => {
   // Update an existing hackathon
   const updateHackathon = async (hackathon: Hackathon): Promise<void> => {
     try {
-      const updatedHackathon = await hackathonService.updateHackathon(hackathon);
+      const updatedHackathon = await hackathonService.updateHackathon(
+        hackathon
+      );
       if (updatedHackathon) {
-        setAllHackathons(prevHackathons => 
-          prevHackathons.map(h => h.id === updatedHackathon.id ? updatedHackathon : h)
+        setAllHackathons((prevHackathons) =>
+          prevHackathons.map((h) =>
+            h.id === updatedHackathon.id ? updatedHackathon : h
+          )
         );
-        
+
         // Update featured hackathons
         const featured = await hackathonService.getFeaturedHackathons();
         setFeaturedHackathons(featured);
-        
+
         // Clear any previous errors
         setError(null);
       }
     } catch (error: any) {
-      console.error('Error updating hackathon:', error);
-      
+      console.error("Error updating hackathon:", error);
+
       // Set error message in context for displaying to user
-      let errorMessage = 'Failed to update hackathon';
-      
-      if (error.message && typeof error.message === 'string') {
-        if (error.message.includes('Network Error') || 
-            error.message.includes('connect') || 
-            error.message.includes('timeout') ||
-            error.message.includes('server')) {
+      let errorMessage = "Failed to update hackathon";
+
+      if (error.message && typeof error.message === "string") {
+        if (
+          error.message.includes("Network Error") ||
+          error.message.includes("connect") ||
+          error.message.includes("timeout") ||
+          error.message.includes("server")
+        ) {
           errorMessage = `Network error: ${error.message}`;
         } else {
           errorMessage = error.message;
         }
-      } else if (error.response && error.response.data && error.response.data.message) {
+      } else if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
         errorMessage = error.response.data.message;
       }
-      
+
       setError(errorMessage);
       throw error;
     }
@@ -157,14 +200,16 @@ export const HackathonProvider = ({ children }: HackathonProviderProps) => {
     try {
       const success = await hackathonService.deleteHackathon(id);
       if (success) {
-        setAllHackathons(prevHackathons => prevHackathons.filter(h => h.id !== id));
-        
+        setAllHackathons((prevHackathons) =>
+          prevHackathons.filter((h) => h.id !== id)
+        );
+
         // Update featured hackathons
         const featured = await hackathonService.getFeaturedHackathons();
         setFeaturedHackathons(featured);
       }
     } catch (error) {
-      console.error('Error deleting hackathon:', error);
+      console.error("Error deleting hackathon:", error);
       throw error;
     }
   };
@@ -177,7 +222,7 @@ export const HackathonProvider = ({ children }: HackathonProviderProps) => {
     deleteHackathon,
     featuredHackathons,
     isLoading,
-    error
+    error,
   };
 
   return (
@@ -190,7 +235,7 @@ export const HackathonProvider = ({ children }: HackathonProviderProps) => {
 export function useHackathons(): HackathonContextType {
   const context = useContext(HackathonContext);
   if (context === undefined) {
-    throw new Error('useHackathons must be used within a HackathonProvider');
+    throw new Error("useHackathons must be used within a HackathonProvider");
   }
   return context;
-}; 
+}
