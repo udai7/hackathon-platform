@@ -108,6 +108,19 @@ const Dashboard = () => {
     );
   }
 
+  // Calculate number of hackathons won by participant
+  const wonCount =
+    user.role === "participant"
+      ? myParticipations.filter(
+          (p) =>
+            p.participant.projectSubmission &&
+            p.participant.projectSubmission.winner &&
+            ["1st", "2nd", "3rd"].includes(
+              p.participant.projectSubmission.winner.position
+            )
+        ).length
+      : 0;
+
   const stats = {
     totalHackathons:
       user.role === "host" ? userHackathons.length : myParticipations.length,
@@ -130,6 +143,7 @@ const Dashboard = () => {
         : myParticipations.filter(
             (p) => new Date(p.hackathon.endDate) < new Date()
           ).length,
+    wonHackathons: wonCount,
   };
 
   return (
@@ -220,6 +234,25 @@ const Dashboard = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Won Card for participants */}
+          {user.role === "participant" && (
+            <Card className="card-3d glass-dark">
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <div className="p-3 rounded-full bg-pink-500/20">
+                    <FaTrophy className="h-6 w-6 text-pink-400" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-400">Won</p>
+                    <p className="text-2xl font-bold text-white">
+                      {stats.wonHackathons}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Navigation Tabs */}
@@ -355,16 +388,26 @@ const Dashboard = () => {
                                 {hackathon.title}
                               </h4>
                               <p className="text-gray-400 text-sm">
-                                Status: {" "}
-                                <span className="capitalize">{participant.status}</span>
+                                Status:{" "}
+                                <span className="capitalize">
+                                  {participant.status}
+                                </span>
                                 {participant.projectSubmission?.winner && (
                                   <>
                                     <span className="ml-3 inline-flex items-center px-2 py-1 bg-green-600 text-black text-xs font-semibold rounded">
-                                      {participant.projectSubmission.winner.position} Winner
+                                      {
+                                        participant.projectSubmission.winner
+                                          .position
+                                      }{" "}
+                                      Winner
                                     </span>
-                                    {participant.projectSubmission.winner.description && (
+                                    {participant.projectSubmission.winner
+                                      .description && (
                                       <div className="mt-1 text-xs text-gray-300">
-                                        {participant.projectSubmission.winner.description}
+                                        {
+                                          participant.projectSubmission.winner
+                                            .description
+                                        }
                                       </div>
                                     )}
                                   </>
