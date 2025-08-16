@@ -7,6 +7,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { User } from "../types";
+import api from "../services/api";
 
 // Auth context interface
 interface AuthContextType {
@@ -68,17 +69,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   // Check session validity
   const checkSession = () => {
-    const token = localStorage.getItem("authToken");
-    const sessionExpiry = localStorage.getItem("sessionExpiry");
+    const token = sessionStorage.getItem("authToken");
+    const sessionExpiry = sessionStorage.getItem("sessionExpiry");
 
     if (!token || !sessionExpiry) {
       return false;
     }
 
     if (isTokenExpired(token) || Date.now() > parseInt(sessionExpiry)) {
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("sessionExpiry");
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("authToken");
+      sessionStorage.removeItem("sessionExpiry");
+      sessionStorage.removeItem("user");
       return false;
     }
 
@@ -88,7 +89,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   // Refresh session
   const refreshSession = async () => {
     try {
-      const token = localStorage.getItem("authToken");
+      const token = sessionStorage.getItem("authToken");
       if (!token) return;
 
       const response = await fetch("/api/auth/refresh", {
@@ -101,8 +102,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem("authToken", data.token);
-        localStorage.setItem(
+        sessionStorage.setItem("authToken", data.token);
+        sessionStorage.setItem(
           "sessionExpiry",
           (Date.now() + SESSION_TIMEOUT).toString()
         );
@@ -137,37 +138,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setIsLoading(true);
 
       if (checkSession()) {
-        const storedUser = localStorage.getItem("user");
+        const storedUser = sessionStorage.getItem("user");
         if (storedUser) {
           setUser(JSON.parse(storedUser));
         }
       }
 
-      // Initialize admin account if it doesn't exist
-      const users = JSON.parse(localStorage.getItem("users") || "[]");
-      // Initialize admin account from environment variables
-      const adminEmail =
-        import.meta.env.VITE_ADMIN_EMAIL || "admin@hackpub.com";
-      const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || "admin123";
-
-      const adminExists = users.some(
-        (u: { email: string; role: string }) =>
-          u.email === adminEmail && u.role === "admin"
-      );
-
-      if (!adminExists) {
-        const adminUser = {
-          id: "admin-001",
-          name: "Administrator",
-          email: adminEmail,
-          password: adminPassword,
-          role: "admin",
-          createdAt: new Date().toISOString(),
-        };
-
-        users.push(adminUser);
-        localStorage.setItem("users", JSON.stringify(users));
-      }
+      // admin seeding moved to server-side reset script
 
       setIsLoading(false);
     };
@@ -175,60 +152,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     initializeAuth();
   }, []);
 
-  // Generate JWT token (client-side simulation)
-  const generateToken = (user: User) => {
-    const header = { alg: "HS256", typ: "JWT" };
-    const payload = {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours
-    };
-
-    // This is a simplified JWT generation for demo purposes
-    // In production, this should be done server-side
-    const encodedHeader = btoa(JSON.stringify(header));
-    const encodedPayload = btoa(JSON.stringify(payload));
-    const signature = btoa(`${encodedHeader}.${encodedPayload}.secret`);
-
-    return `${encodedHeader}.${encodedPayload}.${signature}`;
-  };
+  // No client-side token generation; server issues tokens
 
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const users = JSON.parse(localStorage.getItem("users") || "[]");
-      const foundUser = users.find(
-        (u: any) => u.email === email && u.password === password
-      );
-
-      if (!foundUser) {
-        throw new Error("Invalid email or password");
+      const res = await api.post("/auth/login", { email, password });
+      const { token, user: u } = res.data;
+      if (token) {
+        sessionStorage.setItem("authToken", token);
+        sessionStorage.setItem(
+          "sessionExpiry",
+          (Date.now() + SESSION_TIMEOUT).toString()
+        );
+        sessionStorage.setItem("user", JSON.stringify(u));
+        setUser(u);
+      } else {
+        throw new Error("Login failed");
       }
-
-      const userWithoutPassword = {
-        id: foundUser.id,
-        name: foundUser.name,
-        email: foundUser.email,
-        role: foundUser.role,
-        createdAt: foundUser.createdAt,
-        avatar: foundUser.avatar,
-        provider: foundUser.provider || "local",
-      };
-
-      // Generate session
-      const token = generateToken(userWithoutPassword);
-      const sessionExpiry = Date.now() + SESSION_TIMEOUT;
-
-      localStorage.setItem("authToken", token);
-      localStorage.setItem("sessionExpiry", sessionExpiry.toString());
-      localStorage.setItem("user", JSON.stringify(userWithoutPassword));
-
-      setUser(userWithoutPassword);
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -240,56 +181,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const loginWithGoogle = async (credential: string) => {
     try {
       setIsLoading(true);
-
-      // Decode Google JWT credential
-      const googleUser = decodeJWT(credential);
-      if (!googleUser) {
-        throw new Error("Invalid Google credential");
-      }
-
-      const users = JSON.parse(localStorage.getItem("users") || "[]");
-      let foundUser = users.find((u: any) => u.email === googleUser.email);
-
-      if (!foundUser) {
-        // Create new user from Google account
-        foundUser = {
-          id: `google-${Date.now()}`,
-          name: googleUser.name,
-          email: googleUser.email,
-          role: "participant", // Default role for Google users
-          createdAt: new Date().toISOString(),
-          avatar: googleUser.picture,
-          provider: "google",
-        };
-
-        users.push(foundUser);
-        localStorage.setItem("users", JSON.stringify(users));
+      // For Google OAuth, delegate to backend if implemented.
+      // Here we assume a backend endpoint /auth/google exists (not yet implemented).
+      const res = await api.post("/auth/google", { credential });
+      const { token, user: u } = res.data;
+      if (token) {
+        sessionStorage.setItem("authToken", token);
+        sessionStorage.setItem(
+          "sessionExpiry",
+          (Date.now() + SESSION_TIMEOUT).toString()
+        );
+        sessionStorage.setItem("user", JSON.stringify(u));
+        setUser(u);
       } else {
-        // Update existing user with Google info
-        foundUser.avatar = googleUser.picture;
-        foundUser.provider = "google";
-        localStorage.setItem("users", JSON.stringify(users));
+        throw new Error("Google login failed");
       }
-
-      const userWithoutPassword = {
-        id: foundUser.id,
-        name: foundUser.name,
-        email: foundUser.email,
-        role: foundUser.role,
-        createdAt: foundUser.createdAt,
-        avatar: foundUser.avatar,
-        provider: (foundUser.provider as "local" | "google") || "local",
-      };
-
-      // Generate session
-      const token = generateToken(userWithoutPassword);
-      const sessionExpiry = Date.now() + SESSION_TIMEOUT;
-
-      localStorage.setItem("authToken", token);
-      localStorage.setItem("sessionExpiry", sessionExpiry.toString());
-      localStorage.setItem("user", JSON.stringify(userWithoutPassword));
-
-      setUser(userWithoutPassword);
     } catch (error) {
       console.error("Google login error:", error);
       throw error;
@@ -306,49 +212,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   ) => {
     try {
       setIsLoading(true);
-
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const users = JSON.parse(localStorage.getItem("users") || "[]");
-
-      // Check if user already exists
-      const existingUser = users.find((u: any) => u.email === email);
-      if (existingUser) {
-        throw new Error("User with this email already exists");
-      }
-
-      const newUser = {
-        id: `user-${Date.now()}`,
+      const res = await api.post("/auth/register", {
         name,
         email,
         password,
         role,
-        createdAt: new Date().toISOString(),
-        provider: "local",
-      };
-
-      users.push(newUser);
-      localStorage.setItem("users", JSON.stringify(users));
-
-      const userWithoutPassword = {
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-        createdAt: newUser.createdAt,
-        provider: newUser.provider as "local" | "google",
-      };
-
-      // Generate session
-      const token = generateToken(userWithoutPassword);
-      const sessionExpiry = Date.now() + SESSION_TIMEOUT;
-
-      localStorage.setItem("authToken", token);
-      localStorage.setItem("sessionExpiry", sessionExpiry.toString());
-      localStorage.setItem("user", JSON.stringify(userWithoutPassword));
-
-      setUser(userWithoutPassword);
+      });
+      const { token, user: u } = res.data;
+      if (token) {
+        sessionStorage.setItem("authToken", token);
+        sessionStorage.setItem(
+          "sessionExpiry",
+          (Date.now() + SESSION_TIMEOUT).toString()
+        );
+        sessionStorage.setItem("user", JSON.stringify(u));
+        setUser(u);
+      } else {
+        throw new Error("Registration failed");
+      }
     } catch (error) {
       console.error("Registration error:", error);
       throw error;
@@ -358,9 +239,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("sessionExpiry");
-    localStorage.removeItem("user");
+    // Call backend to clear refresh token cookie
+    api.post("/auth/logout").catch(() => {});
+    sessionStorage.removeItem("authToken");
+    sessionStorage.removeItem("sessionExpiry");
+    sessionStorage.removeItem("user");
     setUser(null);
     navigate("/");
   };

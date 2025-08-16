@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "server": "tsx server.ts",
+    "reset-db": "tsx ./scripts/reset-db.ts",
     "dev:full": "concurrently \"npm run dev\" \"npm run server\"",
     "backend": "node start-backend.js",
     "backend:debug": "set DEBUG=* && node start-backend.js",
@@ -37,6 +38,8 @@
     "framer-motion": "^12.23.12",
     "googleapis": "^155.0.1",
     "jsonwebtoken": "^9.0.2",
+    "cookie-parser": "^1.4.6",
+    "bcryptjs": "^2.4.3",
     "lucide-react": "^0.539.0",
     "mongodb": "^6.15.0",
     "mongoose": "^8.12.2",
@@ -66,6 +69,9 @@
     "tsx": "^4.19.3",
     "typescript": "~5.3.3",
     "typescript-eslint": "^7.0.0",
-    "vite": "^5.0.10"
+    "vite": "^5.0.10",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/cookie-parser": "^1.4.3",
+    "@types/bcryptjs": "^2.4.2"
   }
 }

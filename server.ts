@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction, Router } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { connectDB } from "./src/db/connection";
 import { v4 as uuidv4 } from "uuid";
@@ -8,6 +9,7 @@ import { Hackathon, User, Participant, Payment } from "./src/types";
 import { hackathonsData } from "./src/data/hackathons";
 import razorpayService from "./src/services/razorpay";
 import geminiService from "./src/services/gemini";
+import authRoutes from "./src/routes/auth";
 
 // Load environment variables
 dotenv.config();
@@ -24,8 +26,10 @@ let inMemoryHackathons: Hackathon[] = [];
 let isUsingFallback = false;
 
 // Middlewares
-app.use(cors());
+// Enable CORS with credentials for cookies
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 // Log middleware for debugging
 app.use((req, res, next) => {
@@ -403,6 +407,20 @@ const registerParticipant = (req: Request, res: Response): void => {
   // Generate ID for participant if not provided
   if (!participantData.id) {
     participantData.id = uuidv4();
+  }
+
+  try {
+    if ((participantData as any).projectSubmission) {
+      delete (participantData as any).projectSubmission;
+    }
+    if ((participantData as any).notifications) {
+      delete (participantData as any).notifications;
+    }
+    // remove payment-related fields which will be set server-side
+    delete (participantData as any).paymentStatus;
+    delete (participantData as any).paymentId;
+  } catch (e) {
+    // non-fatal
   }
 
   if (isUsingFallback) {
@@ -1058,30 +1076,53 @@ const declareWinner = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Prevent redeclaring a winner for the same participant
-    if (participant.projectSubmission.winner) {
+    // Allow redeclaration when explicit overwrite flag is provided.
+    // The client can set ?overwrite=true or include { overwrite: true } in the body.
+    const overwrite =
+      (req.query && (req.query as any).overwrite === "true") ||
+      (req.body && (req.body as any).overwrite === true);
+
+    // Check if winner is already declared for THIS specific hackathon
+    const existingWinner = participant.projectSubmission.winner;
+
+    // Only prevent winner declaration if there's already a winner for THIS hackathon
+    if (
+      existingWinner &&
+      existingWinner.hackathonId === hackathonId &&
+      !overwrite
+    ) {
       console.warn(
         `declareWinner: winner already declared for participantId=${participantId} in hackathon=${hackathonId}`
       );
-      res
-        .status(400)
-        .json({ error: "Winner already declared for this participant" });
+      res.status(400).json({
+        error: "Winner already declared for this participant in this hackathon",
+      });
       return;
     }
+
+    // If overwriting, keep note of previous winner details for inclusion in notification only.
+    const previousWinner = existingWinner ? { ...existingWinner } : null;
 
     participant.projectSubmission.winner = {
       position,
       description,
       declaredBy,
       declaredAt: new Date(),
+      hackathonId, // Store which hackathon this winner declaration is for
     } as any;
 
-    // Add notification for the participant
+    // Add notification for the participant. If this is an overwrite, mention the previous winner in the message.
+    const noteMessage = previousWinner
+      ? `Winner updated: previously ${previousWinner.position} (declared by ${
+          previousWinner.declaredBy
+        }). Now declared ${position}. ${description || ""}`
+      : `Congratulations! Your project has been declared ${position}. ${
+          description || ""
+        }`;
+
     const note = {
       id: `note-${Date.now()}`,
-      message: `Congratulations! Your project has been declared ${position}. ${
-        description || ""
-      }`,
+      message: noteMessage,
       tag: position,
       read: false,
       createdAt: new Date(),
@@ -1186,7 +1227,9 @@ router.post(
 );
 router.get("/hackathons/:hackathonId/analytics", getParticipantAnalytics);
 
-// Mount the router to the /api path
+// Mount auth routes and main router
+app.use("/api/auth", authRoutes);
+// Mount the main router to the /api path
 app.use("/api", router);
 
 // Start server

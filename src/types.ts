@@ -98,6 +98,7 @@ export interface Participant {
       description?: string;
       declaredBy?: string;
       declaredAt?: Date;
+      hackathonId?: string; // Track which hackathon this winner declaration is for
     };
   };
   notifications?: {
