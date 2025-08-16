@@ -57,6 +57,16 @@ const Navbar = () => {
             >
               Explore Hackathons
             </Link>
+            <Link
+              to="/participants"
+              className={`px-3 py-2 text-sm font-medium transition-all duration-200 hover:scale-105 ${
+                location.pathname === "/participants"
+                  ? "text-blue-400 neon-blue"
+                  : "text-gray-300 hover:text-blue-400"
+              }`}
+            >
+              Explore Participants
+            </Link>
 
             {user ? (
               <>
@@ -148,6 +158,17 @@ const Navbar = () => {
               onClick={closeMenu}
             >
               Explore Hackathons
+            </Link>
+            <Link
+              to="/participants"
+              className={`block px-3 py-2 rounded-md text-base font-medium transition-all duration-200 ${
+                location.pathname === "/participants"
+                  ? "text-blue-400 bg-blue-500/10 neon-border"
+                  : "text-gray-300 hover:text-blue-400 hover:bg-gray-800/50"
+              }`}
+              onClick={closeMenu}
+            >
+              Explore Participants
             </Link>
 
             {user ? (

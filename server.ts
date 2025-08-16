@@ -4,8 +4,19 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { connectDB } from "./src/db/connection";
 import { v4 as uuidv4 } from "uuid";
-import { HackathonModel, UserModel, PaymentModel } from "./src/db/models";
-import { Hackathon, User, Participant, Payment } from "./src/types";
+import {
+  HackathonModel,
+  UserModel,
+  PaymentModel,
+  ProfileModel,
+} from "./src/db/models";
+import {
+  Hackathon,
+  User,
+  Participant,
+  Payment,
+  ParticipantProfile,
+} from "./src/types";
 import { hackathonsData } from "./src/data/hackathons";
 import razorpayService from "./src/services/razorpay";
 import geminiService from "./src/services/gemini";
@@ -501,6 +512,24 @@ const registerParticipant = (req: Request, res: Response): void => {
       });
     })
     .then((result) => {
+      // Update participant's profile stats if they have a profile
+      ProfileModel.findOne({ userId: participantData.userId })
+        .then((profile) => {
+          if (profile) {
+            // Recalculate total participations
+            return HackathonModel.find({
+              "participants.userId": participantData.userId,
+            }).then((allHackathons) => {
+              profile.totalParticipations = allHackathons.length;
+              return profile.save();
+            });
+          }
+        })
+        .catch((profileError) => {
+          console.error("Error updating profile stats:", profileError);
+          // Don't fail the registration if profile update fails
+        });
+
       // Return payment information if required
       res.status(201).json({
         ...result.participant,
@@ -1133,6 +1162,36 @@ const declareWinner = async (req: Request, res: Response): Promise<void> => {
 
     await hackathon.save();
 
+    // Update participant's profile stats if they have a profile
+    try {
+      const profile = await ProfileModel.findOne({
+        userId: participant.userId,
+      });
+      if (profile) {
+        // Recalculate hackathons won
+        const allHackathons = await HackathonModel.find({
+          "participants.userId": participant.userId,
+        });
+
+        let hackathonsWon = 0;
+        allHackathons.forEach((h) => {
+          const p = h.participants?.find(
+            (p) => p.userId === participant.userId
+          );
+          if (p?.projectSubmission?.winner) {
+            hackathonsWon++;
+          }
+        });
+
+        profile.hackathonsWon = hackathonsWon;
+        profile.totalParticipations = allHackathons.length;
+        await profile.save();
+      }
+    } catch (profileError) {
+      console.error("Error updating profile stats:", profileError);
+      // Don't fail the winner declaration if profile update fails
+    }
+
     res.status(200).json({ message: "Winner declared", participant, note });
   } catch (error) {
     console.error("Error declaring winner:", error);
@@ -1196,6 +1255,110 @@ const getParticipantAnalytics = async (
   }
 };
 
+// Profile API functions
+const createOrUpdateProfile = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const profileData = req.body as Partial<ParticipantProfile>;
+
+    if (!profileData.userId) {
+      res.status(400).json({ error: "userId is required" });
+      return;
+    }
+
+    // Calculate hackathons won and total participations
+    const hackathons = await HackathonModel.find({
+      "participants.userId": profileData.userId,
+    });
+
+    let hackathonsWon = 0;
+    let totalParticipations = hackathons.length;
+
+    hackathons.forEach((hackathon) => {
+      const participant = hackathon.participants?.find(
+        (p) => p.userId === profileData.userId
+      );
+      if (participant?.projectSubmission?.winner) {
+        hackathonsWon++;
+      }
+    });
+
+    profileData.hackathonsWon = hackathonsWon;
+    profileData.totalParticipations = totalParticipations;
+
+    const existingProfile = await ProfileModel.findOne({
+      userId: profileData.userId,
+    });
+
+    if (existingProfile) {
+      // Update existing profile
+      Object.assign(existingProfile, profileData);
+      const updatedProfile = await existingProfile.save();
+      res.status(200).json(updatedProfile);
+    } else {
+      // Create new profile
+      const newProfile = new ProfileModel(profileData);
+      const savedProfile = await newProfile.save();
+      res.status(201).json(savedProfile);
+    }
+  } catch (error) {
+    console.error("Error creating/updating profile:", error);
+    res.status(500).json({ error: "Failed to save profile" });
+  }
+};
+
+const getProfile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userId } = req.params;
+    const profile = await ProfileModel.findOne({ userId });
+
+    if (!profile) {
+      res.status(404).json({ error: "Profile not found" });
+      return;
+    }
+
+    res.status(200).json(profile);
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    res.status(500).json({ error: "Failed to fetch profile" });
+  }
+};
+
+const getAllProfiles = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Only return public profiles, sorted by hackathons won (descending)
+    const profiles = await ProfileModel.find({ isPublic: true }).sort({
+      hackathonsWon: -1,
+      totalParticipations: -1,
+      name: 1,
+    });
+
+    res.status(200).json(profiles);
+  } catch (error) {
+    console.error("Error fetching profiles:", error);
+    res.status(500).json({ error: "Failed to fetch profiles" });
+  }
+};
+
+const deleteProfile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { userId } = req.params;
+    const result = await ProfileModel.deleteOne({ userId });
+
+    if (result.deletedCount === 0) {
+      res.status(404).json({ error: "Profile not found" });
+      return;
+    }
+
+    res.status(200).json({ message: "Profile deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting profile:", error);
+    res.status(500).json({ error: "Failed to delete profile" });
+  }
+};
+
 // Register routes
 router.get("/hackathons", getAllHackathons);
 router.get("/hackathons/featured", getFeaturedHackathons);
@@ -1226,6 +1389,12 @@ router.post(
   declareWinner
 );
 router.get("/hackathons/:hackathonId/analytics", getParticipantAnalytics);
+
+// Profile routes
+router.post("/profiles", createOrUpdateProfile);
+router.get("/profiles", getAllProfiles);
+router.get("/profiles/:userId", getProfile);
+router.delete("/profiles/:userId", deleteProfile);
 
 // Mount auth routes and main router
 app.use("/api/auth", authRoutes);

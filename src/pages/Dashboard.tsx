@@ -14,6 +14,7 @@ import {
   FaMapMarkerAlt,
   FaFire,
   FaRocket,
+  FaUser,
 } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { useHackathons } from "../context/HackathonContext";
@@ -25,6 +26,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
+import CreateProfile from "../components/CreateProfile";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -280,6 +282,19 @@ const Dashboard = () => {
               <FaCode className="inline mr-2" />
               {user.role === "host" ? "My Hackathons" : "My Participations"}
             </button>
+            {user.role === "participant" && (
+              <button
+                onClick={() => setActiveTab("profile")}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  activeTab === "profile"
+                    ? "bg-blue-600 text-white shadow-lg"
+                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                }`}
+              >
+                <FaUser className="inline mr-2" />
+                Create Profile
+              </button>
+            )}
           </div>
         </div>
 
@@ -666,6 +681,12 @@ const Dashboard = () => {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === "profile" && user.role === "participant" && (
+          <div>
+            <CreateProfile />
           </div>
         )}
       </div>

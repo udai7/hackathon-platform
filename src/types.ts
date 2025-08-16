@@ -109,3 +109,39 @@ export interface Participant {
     createdAt?: Date;
   }[];
 }
+
+export interface ParticipantProfile {
+  id: string;
+  userId: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  bio?: string;
+  title?: string; // e.g., "Full Stack Developer", "AI/ML Engineer"
+  location?: string;
+  website?: string;
+  github?: string;
+  linkedin?: string;
+  twitter?: string;
+  skills: string[];
+  experience: string; // e.g., "2-3 years", "5+ years"
+  education?: {
+    degree?: string;
+    institution?: string;
+    graduationYear?: string;
+  };
+  achievements?: string[];
+  projects?: {
+    title: string;
+    description: string;
+    technologies: string[];
+    githubUrl?: string;
+    liveUrl?: string;
+    imageUrl?: string;
+  }[];
+  hackathonsWon: number;
+  totalParticipations: number;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+}

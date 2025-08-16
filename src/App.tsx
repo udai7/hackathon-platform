@@ -14,6 +14,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import SubmitProject from "./pages/SubmitProject";
+import ExploreParticipants from "./pages/ExploreParticipants";
+import ParticipantProfile from "./pages/ParticipantProfile";
 
 function App() {
   return (
@@ -44,6 +46,14 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/hackathons" element={<Hackathons />} />
+                  <Route
+                    path="/participants"
+                    element={<ExploreParticipants />}
+                  />
+                  <Route
+                    path="/participant/:userId"
+                    element={<ParticipantProfile />}
+                  />
                   <Route path="/hackathon/:id" element={<HackathonDetails />} />
                   <Route
                     path="/create-hackathon"
