@@ -12,17 +12,11 @@ import {
   FaSearch,
   FaFilter,
   FaStar,
-  FaEye,
 } from "react-icons/fa";
 import { ParticipantProfile } from "../types";
 import profileService from "../services/profileService";
 import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
+import { Card, CardContent } from "../components/ui/card";
 
 const ExploreParticipants = () => {
   const [profiles, setProfiles] = useState<ParticipantProfile[]>([]);
@@ -199,83 +193,85 @@ const ExploreParticipants = () => {
           {filteredAndSortedProfiles.map((profile) => (
             <Card
               key={profile.id}
-              className="card-3d glass-dark hover:scale-105 transition-transform duration-300"
+              className="overflow-hidden bg-gradient-to-b from-gray-800/90 to-gray-900/90 border border-gray-700/50 hover:border-purple-400/50 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-purple-500/20"
             >
-              <CardContent className="p-6">
-                <div className="text-center mb-4">
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 flex items-center justify-center">
-                    {profile.avatar ? (
+              {/* Header Area with Large Avatar */}
+              <div className="relative h-48 overflow-hidden">
+                {/* Avatar as background image */}
+                <div className="w-full h-full bg-gradient-to-br from-purple-600/30 via-blue-600/30 to-cyan-600/30 relative">
+                  {profile.avatar ? (
+                    <>
                       <img
                         src={profile.avatar}
                         alt={profile.name}
-                        className="w-full h-full rounded-full object-cover"
+                        className="w-full h-full object-cover"
                       />
-                    ) : (
-                      <FaUser className="w-8 h-8 text-gray-400" />
-                    )}
-                  </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-700 to-gray-800">
+                        <FaUser className="w-20 h-20 text-gray-400" />
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    </>
+                  )}
+                </div>
+
+                {/* Top Right Category Tag */}
+                <div className="absolute top-3 right-3">
+                  <span className="px-3 py-1 bg-blue-500 text-white text-xs font-semibold rounded-full">
+                    {profile.title || "Developer"}
+                  </span>
+                </div>
+              </div>
+
+              <CardContent className="pt-6 pb-4 px-4">
+                {/* Title and Subtitle */}
+                <div className="text-center mb-4">
                   <h3 className="text-xl font-bold text-white mb-1">
                     {profile.name}
                   </h3>
-                  {profile.title && (
-                    <p className="text-blue-400 text-sm mb-2">
-                      {profile.title}
-                    </p>
-                  )}
-                  {profile.location && (
-                    <p className="text-gray-400 text-sm flex items-center justify-center">
-                      <FaMapMarkerAlt className="mr-1" />
-                      {profile.location}
-                    </p>
-                  )}
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="text-center p-3 bg-gray-800/30 rounded-lg">
-                    <div className="flex items-center justify-center mb-1">
-                      <FaTrophy className="text-yellow-400 mr-1" />
-                      <span className="text-2xl font-bold text-white">
-                        {profile.hackathonsWon}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-400">Wins</p>
-                  </div>
-                  <div className="text-center p-3 bg-gray-800/30 rounded-lg">
-                    <div className="flex items-center justify-center mb-1">
-                      <FaCode className="text-blue-400 mr-1" />
-                      <span className="text-2xl font-bold text-white">
-                        {profile.totalParticipations}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-400">Participations</p>
-                  </div>
-                </div>
-
-                {/* Bio */}
-                {profile.bio && (
-                  <p className="text-gray-300 text-sm mb-4 line-clamp-3">
-                    {profile.bio}
+                  <p className="text-gray-400 text-sm">
+                    {profile.bio
+                      ? profile.bio.slice(0, 50) +
+                        (profile.bio.length > 50 ? "..." : "")
+                      : "No bio available"}
                   </p>
+                </div>
+
+                {/* Stats Row - Similar to participants count */}
+                <div className="flex items-center justify-center text-blue-400 text-sm mb-2">
+                  <FaTrophy className="mr-1" />
+                  {profile.hackathonsWon} Win
+                  {profile.hackathonsWon !== 1 ? "s" : ""} •{" "}
+                  {profile.totalParticipations} Participation
+                  {profile.totalParticipations !== 1 ? "s" : ""}
+                </div>
+
+                {/* Location - Similar to date */}
+                {profile.location && (
+                  <div className="flex items-center justify-center text-gray-400 text-sm mb-3">
+                    <FaMapMarkerAlt className="mr-1" />
+                    {profile.location}
+                  </div>
                 )}
 
-                {/* Skills */}
-                <div className="mb-4">
-                  <div className="flex flex-wrap gap-1">
-                    {profile.skills.slice(0, 4).map((skill, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded text-xs"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                    {profile.skills.length > 4 && (
-                      <span className="px-2 py-1 bg-gray-500/20 text-gray-300 rounded text-xs">
-                        +{profile.skills.length - 4} more
-                      </span>
-                    )}
-                  </div>
+                {/* Skills - Similar to category tags */}
+                <div className="flex flex-wrap gap-1 justify-center mb-4">
+                  {profile.skills.slice(0, 3).map((skill, index) => (
+                    <span
+                      key={index}
+                      className="px-2 py-1 bg-purple-500/20 text-purple-300 text-xs rounded border border-purple-500/30"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                  {profile.skills.length > 3 && (
+                    <span className="px-2 py-1 bg-gray-700/50 text-gray-400 text-xs rounded border border-gray-600/30">
+                      +{profile.skills.length - 3}
+                    </span>
+                  )}
                 </div>
 
                 {/* Social Links */}
@@ -291,7 +287,7 @@ const ExploreParticipants = () => {
                       rel="noopener noreferrer"
                       className="text-gray-400 hover:text-white transition-colors"
                     >
-                      <FaGithub className="w-5 h-5" />
+                      <FaGithub className="w-4 h-4" />
                     </a>
                   )}
                   {profile.linkedin && (
@@ -305,7 +301,7 @@ const ExploreParticipants = () => {
                       rel="noopener noreferrer"
                       className="text-gray-400 hover:text-blue-400 transition-colors"
                     >
-                      <FaLinkedin className="w-5 h-5" />
+                      <FaLinkedin className="w-4 h-4" />
                     </a>
                   )}
                   {profile.twitter && (
@@ -319,7 +315,7 @@ const ExploreParticipants = () => {
                       rel="noopener noreferrer"
                       className="text-gray-400 hover:text-blue-400 transition-colors"
                     >
-                      <FaTwitter className="w-5 h-5" />
+                      <FaTwitter className="w-4 h-4" />
                     </a>
                   )}
                   {profile.website && (
@@ -333,15 +329,18 @@ const ExploreParticipants = () => {
                       rel="noopener noreferrer"
                       className="text-gray-400 hover:text-green-400 transition-colors"
                     >
-                      <FaGlobe className="w-5 h-5" />
+                      <FaGlobe className="w-4 h-4" />
                     </a>
                   )}
                 </div>
 
-                {/* View Profile Button */}
-                <Button asChild variant="glass" className="w-full">
+                {/* View Profile Button - Same style as hackathon card */}
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+                >
                   <Link to={`/participant/${profile.userId}`}>
-                    <FaEye className="mr-2" />
                     View Profile
                   </Link>
                 </Button>

@@ -49,7 +49,14 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ onProfileSaved }) => {
 
   const [newSkill, setNewSkill] = useState("");
   const [newAchievement, setNewAchievement] = useState("");
-  const [newProject, setNewProject] = useState({
+  const [newProject, setNewProject] = useState<{
+    title: string;
+    description: string;
+    technologies: string[];
+    githubUrl: string;
+    liveUrl: string;
+    imageUrl: string;
+  }>({
     title: "",
     description: "",
     technologies: [],
@@ -207,7 +214,7 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ onProfileSaved }) => {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Full Name *
@@ -235,6 +242,53 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ onProfileSaved }) => {
                 placeholder="e.g., Full Stack Developer, AI/ML Engineer"
                 className="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Profile Picture
+              </label>
+              <div className="flex items-center space-x-3">
+                <div className="w-16 h-16 rounded-full bg-gray-700 border-2 border-gray-600 flex items-center justify-center overflow-hidden">
+                  {profile.avatar ? (
+                    <img
+                      src={profile.avatar}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <FaUser className="text-gray-400 w-6 h-6" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <label className="cursor-pointer">
+                    <div className="flex items-center justify-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-medium rounded-lg border border-blue-500/30 hover:border-blue-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20">
+                      <FaUser className="mr-2 w-4 h-4" />
+                      Choose Image
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (e) => {
+                            setProfile((prev) => ({
+                              ...prev,
+                              avatar: e.target?.result as string,
+                            }));
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    JPG, PNG up to 5MB
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -488,6 +542,115 @@ const CreateProfile: React.FC<CreateProfileProps> = ({ onProfileSaved }) => {
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Projects */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-white">
+              Featured Projects
+            </h3>
+            <div className="grid grid-cols-1 gap-3">
+              <input
+                type="text"
+                value={newProject.title}
+                onChange={(e) =>
+                  setNewProject((p) => ({ ...p, title: e.target.value }))
+                }
+                placeholder="Project title"
+                className="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-lg text-white"
+              />
+              <textarea
+                value={newProject.description}
+                onChange={(e) =>
+                  setNewProject((p) => ({ ...p, description: e.target.value }))
+                }
+                placeholder="Project description"
+                className="w-full px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-lg text-white"
+                rows={3}
+              />
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newProjectTech}
+                  onChange={(e) => setNewProjectTech(e.target.value)}
+                  placeholder="Add a technology (e.g., React)"
+                  className="flex-1 px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-lg text-white"
+                />
+                <Button onClick={addProjectTech} variant="glass" size="sm">
+                  <FaPlus />
+                </Button>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {newProject.technologies.map((tech) => (
+                  <span
+                    key={tech}
+                    className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded text-xs inline-flex items-center"
+                  >
+                    {tech}
+                    <button
+                      onClick={() => removeProjectTech(tech)}
+                      className="ml-2 text-purple-300 hover:text-red-300"
+                    >
+                      <FaTrash className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newProject.githubUrl}
+                  onChange={(e) =>
+                    setNewProject((p) => ({ ...p, githubUrl: e.target.value }))
+                  }
+                  placeholder="GitHub URL"
+                  className="flex-1 px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-lg text-white"
+                />
+                <input
+                  type="text"
+                  value={newProject.liveUrl}
+                  onChange={(e) =>
+                    setNewProject((p) => ({ ...p, liveUrl: e.target.value }))
+                  }
+                  placeholder="Live demo URL"
+                  className="flex-1 px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-lg text-white"
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <Button onClick={addProject} variant="cyber">
+                  Add Project
+                </Button>
+              </div>
+
+              {profile.projects && profile.projects.length > 0 && (
+                <div className="space-y-2">
+                  {profile.projects.map((proj, idx) => (
+                    <div key={idx} className="p-3 bg-gray-800/30 rounded-lg">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="text-white font-semibold">
+                            {proj.title}
+                          </h4>
+                          <p className="text-gray-300 text-sm">
+                            {proj.description}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => removeProject(idx)}
+                          className="text-red-400 hover:text-red-300"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
